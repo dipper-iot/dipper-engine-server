@@ -1,0 +1,22 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Uint64
+scalar Timestamp
+scalar Map
+scalar Time
+scalar Any
+
+type Version {
+    version: String!
+}
+
+type Query {
+    version: Version!
+}
+
+
+type Mutation {
+    version: Version!
+}

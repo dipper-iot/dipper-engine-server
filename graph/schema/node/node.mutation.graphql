@@ -1,0 +1,5 @@
+extend type Mutation {
+    UpdateNode(chanId: Uint64!, input: InputNode!): Boolean!
+    UpdateNodes(chanId: Uint64!, input: [InputNode!]): Boolean!
+    DeleteNode(id: Uint64!): Boolean!
+}
