@@ -21,6 +21,7 @@ func (RuleNode) Fields() []ent.Field {
 		field.Uint64("id").Unique().Immutable(),
 		field.Uint64("chain_id").Optional(),
 		field.String("node_id").NotEmpty().MaxLen(20),
+		field.String("rule_id").NotEmpty().MaxLen(100),
 		field.JSON("option", map[string]interface{}{}).Default(map[string]interface{}{}),
 		field.Bool("infinite").Default(false),
 		field.Bool("debug").Default(false),

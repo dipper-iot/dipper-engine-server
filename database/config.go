@@ -22,7 +22,7 @@ func convertStruct(src interface{}, des interface{}) error {
 }
 
 func (c ConfigDatabase) Sqlite() (source string, err error) {
-	source = "dipper.db:ent?mode=memory&cache=shared&_fk=1"
+	source = "dipper.db:dipper?_fk=1"
 
 	raw, ok := c.Options["file_source"]
 	if ok {

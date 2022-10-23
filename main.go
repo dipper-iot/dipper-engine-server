@@ -18,6 +18,7 @@ func main() {
 			Debug:     true,
 			Migration: true,
 		},
+		Dev: true,
 	})
 	s.SetVersion(Version)
 

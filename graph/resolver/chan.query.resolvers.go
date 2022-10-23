@@ -5,7 +5,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dipper-iot/dipper-engine-server/ent"
 	"github.com/dipper-iot/dipper-engine-server/graph/model"
@@ -14,10 +13,18 @@ import (
 
 // ListChan is the resolver for the ListChan field.
 func (r *queryResolver) ListChan(ctx context.Context, input models.ListChanRequest) (*model.ListChan, error) {
-	panic(fmt.Errorf("not implemented: ListChan - ListChan"))
+	list, total, err := r.chanService.List(ctx, &input)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.ListChan{
+		List:  list,
+		Total: total,
+	}, nil
 }
 
 // GetChan is the resolver for the GetChan field.
 func (r *queryResolver) GetChan(ctx context.Context, id uint64) (*ent.RuleChan, error) {
-	panic(fmt.Errorf("not implemented: GetChan - GetChan"))
+	return r.chanService.Get(ctx, id)
 }

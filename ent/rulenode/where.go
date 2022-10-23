@@ -95,6 +95,13 @@ func NodeID(v string) predicate.RuleNode {
 	})
 }
 
+// RuleID applies equality check predicate on the "rule_id" field. It's identical to RuleIDEQ.
+func RuleID(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRuleID), v))
+	})
+}
+
 // Infinite applies equality check predicate on the "infinite" field. It's identical to InfiniteEQ.
 func Infinite(v bool) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
@@ -276,6 +283,105 @@ func NodeIDEqualFold(v string) predicate.RuleNode {
 func NodeIDContainsFold(v string) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldNodeID), v))
+	})
+}
+
+// RuleIDEQ applies the EQ predicate on the "rule_id" field.
+func RuleIDEQ(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDNEQ applies the NEQ predicate on the "rule_id" field.
+func RuleIDNEQ(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDIn applies the In predicate on the "rule_id" field.
+func RuleIDIn(vs ...string) predicate.RuleNode {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldRuleID), v...))
+	})
+}
+
+// RuleIDNotIn applies the NotIn predicate on the "rule_id" field.
+func RuleIDNotIn(vs ...string) predicate.RuleNode {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldRuleID), v...))
+	})
+}
+
+// RuleIDGT applies the GT predicate on the "rule_id" field.
+func RuleIDGT(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDGTE applies the GTE predicate on the "rule_id" field.
+func RuleIDGTE(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDLT applies the LT predicate on the "rule_id" field.
+func RuleIDLT(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDLTE applies the LTE predicate on the "rule_id" field.
+func RuleIDLTE(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDContains applies the Contains predicate on the "rule_id" field.
+func RuleIDContains(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDHasPrefix applies the HasPrefix predicate on the "rule_id" field.
+func RuleIDHasPrefix(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDHasSuffix applies the HasSuffix predicate on the "rule_id" field.
+func RuleIDHasSuffix(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDEqualFold applies the EqualFold predicate on the "rule_id" field.
+func RuleIDEqualFold(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldRuleID), v))
+	})
+}
+
+// RuleIDContainsFold applies the ContainsFold predicate on the "rule_id" field.
+func RuleIDContainsFold(v string) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldRuleID), v))
 	})
 }
 

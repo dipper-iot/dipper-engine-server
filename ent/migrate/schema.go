@@ -16,7 +16,7 @@ var (
 		{Name: "description", Type: field.TypeString, Size: 1000},
 		{Name: "root_node", Type: field.TypeString, Size: 256},
 		{Name: "infinite", Type: field.TypeBool, Default: false},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"deactivated"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"activated", "deactivated"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
@@ -30,6 +30,7 @@ var (
 	RuleNodesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "node_id", Type: field.TypeString, Size: 20},
+		{Name: "rule_id", Type: field.TypeString, Size: 100},
 		{Name: "option", Type: field.TypeJSON},
 		{Name: "infinite", Type: field.TypeBool, Default: false},
 		{Name: "debug", Type: field.TypeBool, Default: false},
@@ -46,7 +47,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "rule_nodes_rule_chan_rules",
-				Columns:    []*schema.Column{RuleNodesColumns[8]},
+				Columns:    []*schema.Column{RuleNodesColumns[9]},
 				RefColumns: []*schema.Column{RuleChanColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

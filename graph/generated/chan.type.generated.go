@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/dipper-iot/dipper-engine-server/ent"
@@ -20,9 +21,9 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type ChanResolver interface {
+	Nodes(ctx context.Context, obj *ent.RuleChan) ([]*ent.RuleNode, error)
+
 	Status(ctx context.Context, obj *ent.RuleChan) (*model.ChanStatus, error)
-	CreatedAt(ctx context.Context, obj *ent.RuleChan) (*string, error)
-	UpdatedAt(ctx context.Context, obj *ent.RuleChan) (*string, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -207,6 +208,69 @@ func (ec *executionContext) fieldContext_Chan_root_node(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Chan_nodes(ctx context.Context, field graphql.CollectedField, obj *ent.RuleChan) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Chan_nodes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Chan().Nodes(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.RuleNode)
+	fc.Result = res
+	return ec.marshalONode2ᚕᚖgithubᚗcomᚋdipperᚑiotᚋdipperᚑengineᚑserverᚋentᚐRuleNodeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Chan_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Chan",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Node_id(ctx, field)
+			case "node_id":
+				return ec.fieldContext_Node_node_id(ctx, field)
+			case "chain_id":
+				return ec.fieldContext_Node_chain_id(ctx, field)
+			case "rule_id":
+				return ec.fieldContext_Node_rule_id(ctx, field)
+			case "option":
+				return ec.fieldContext_Node_option(ctx, field)
+			case "infinite":
+				return ec.fieldContext_Node_infinite(ctx, field)
+			case "debug":
+				return ec.fieldContext_Node_debug(ctx, field)
+			case "end":
+				return ec.fieldContext_Node_end(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Node_created_at(ctx, field)
+			case "updated_at":
+				return ec.fieldContext_Node_updated_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Chan_infinite(ctx context.Context, field graphql.CollectedField, obj *ent.RuleChan) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Chan_infinite(ctx, field)
 	if err != nil {
@@ -303,7 +367,7 @@ func (ec *executionContext) _Chan_created_at(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Chan().CreatedAt(rctx, obj)
+		return obj.CreatedAt, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -312,19 +376,19 @@ func (ec *executionContext) _Chan_created_at(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Chan_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Chan",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -344,7 +408,7 @@ func (ec *executionContext) _Chan_updated_at(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Chan().UpdatedAt(rctx, obj)
+		return obj.UpdatedAt, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -353,19 +417,19 @@ func (ec *executionContext) _Chan_updated_at(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Chan_updated_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Chan",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -459,6 +523,8 @@ func (ec *executionContext) fieldContext_ListChan_list(ctx context.Context, fiel
 				return ec.fieldContext_Chan_description(ctx, field)
 			case "root_node":
 				return ec.fieldContext_Chan_root_node(ctx, field)
+			case "nodes":
+				return ec.fieldContext_Chan_nodes(ctx, field)
 			case "infinite":
 				return ec.fieldContext_Chan_infinite(ctx, field)
 			case "status":
@@ -568,7 +634,7 @@ func (ec *executionContext) unmarshalInputSetStatusChan(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			it.ID, err = ec.unmarshalNUint642uint64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -576,7 +642,7 @@ func (ec *executionContext) unmarshalInputSetStatusChan(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalOChanStatus2ᚖgithubᚗcomᚋdipperᚑiotᚋdipperᚑengineᚑserverᚋgraphᚋmodelᚐChanStatus(ctx, v)
+			it.Status, err = ec.unmarshalNChanStatus2githubᚗcomᚋdipperᚑiotᚋdipperᚑengineᚑserverᚋgraphᚋmodelᚐChanStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -626,6 +692,23 @@ func (ec *executionContext) _Chan(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Chan_root_node(ctx, field, obj)
 
+		case "nodes":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Chan_nodes(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "infinite":
 
 			out.Values[i] = ec._Chan_infinite(ctx, field, obj)
@@ -648,39 +731,13 @@ func (ec *executionContext) _Chan(ctx context.Context, sel ast.SelectionSet, obj
 
 			})
 		case "created_at":
-			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Chan_created_at(ctx, field, obj)
-				return res
-			}
+			out.Values[i] = ec._Chan_created_at(ctx, field, obj)
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "updated_at":
-			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Chan_updated_at(ctx, field, obj)
-				return res
-			}
+			out.Values[i] = ec._Chan_updated_at(ctx, field, obj)
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -740,6 +797,16 @@ func (ec *executionContext) marshalNChan2ᚖgithubᚗcomᚋdipperᚑiotᚋdipper
 		return graphql.Null
 	}
 	return ec._Chan(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNChanStatus2githubᚗcomᚋdipperᚑiotᚋdipperᚑengineᚑserverᚋgraphᚋmodelᚐChanStatus(ctx context.Context, v interface{}) (model.ChanStatus, error) {
+	var res model.ChanStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNChanStatus2githubᚗcomᚋdipperᚑiotᚋdipperᚑengineᚑserverᚋgraphᚋmodelᚐChanStatus(ctx context.Context, sel ast.SelectionSet, v model.ChanStatus) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNInputChan2githubᚗcomᚋdipperᚑiotᚋdipperᚑengineᚑserverᚋgraphᚋmodelᚐInputChan(ctx context.Context, v interface{}) (model.InputChan, error) {

@@ -22,6 +22,8 @@ type RuleNode struct {
 	ChainID uint64 `json:"chain_id,omitempty"`
 	// NodeID holds the value of the "node_id" field.
 	NodeID string `json:"node_id,omitempty"`
+	// RuleID holds the value of the "rule_id" field.
+	RuleID string `json:"rule_id,omitempty"`
 	// Option holds the value of the "option" field.
 	Option map[string]interface{} `json:"option,omitempty"`
 	// Infinite holds the value of the "infinite" field.
@@ -72,7 +74,7 @@ func (*RuleNode) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case rulenode.FieldID, rulenode.FieldChainID:
 			values[i] = new(sql.NullInt64)
-		case rulenode.FieldNodeID:
+		case rulenode.FieldNodeID, rulenode.FieldRuleID:
 			values[i] = new(sql.NullString)
 		case rulenode.FieldCreatedAt, rulenode.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -108,6 +110,12 @@ func (rn *RuleNode) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field node_id", values[i])
 			} else if value.Valid {
 				rn.NodeID = value.String
+			}
+		case rulenode.FieldRuleID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field rule_id", values[i])
+			} else if value.Valid {
+				rn.RuleID = value.String
 			}
 		case rulenode.FieldOption:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -185,6 +193,9 @@ func (rn *RuleNode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("node_id=")
 	builder.WriteString(rn.NodeID)
+	builder.WriteString(", ")
+	builder.WriteString("rule_id=")
+	builder.WriteString(rn.RuleID)
 	builder.WriteString(", ")
 	builder.WriteString("option=")
 	builder.WriteString(fmt.Sprintf("%v", rn.Option))

@@ -5,6 +5,7 @@ package resolver
 
 import (
 	"context"
+
 	"github.com/dipper-iot/dipper-engine-server/graph/generated"
 	"github.com/dipper-iot/dipper-engine-server/graph/model"
 )

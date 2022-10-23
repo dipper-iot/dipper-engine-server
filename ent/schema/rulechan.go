@@ -23,7 +23,7 @@ func (RuleChan) Fields() []ent.Field {
 		field.String("description").Nillable().MaxLen(1000),
 		field.String("root_node").NotEmpty().MaxLen(256),
 		field.Bool("infinite").Default(false),
-		field.Enum("status").NamedValues("activated", "deactivated"),
+		field.Enum("status").Values("activated", "deactivated"),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now),
 	}

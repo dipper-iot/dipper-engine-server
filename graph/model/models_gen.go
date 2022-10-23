@@ -15,14 +15,23 @@ type InputChan struct {
 	Description *string `json:"description"`
 }
 
+type InputNode struct {
+	NodeID   string                 `json:"node_id"`
+	RuleID   string                 `json:"rule_id"`
+	Option   map[string]interface{} `json:"option"`
+	Infinite *bool                  `json:"infinite"`
+	Debug    *bool                  `json:"debug"`
+	End      *bool                  `json:"end"`
+}
+
 type ListChan struct {
 	Total int             `json:"total"`
 	List  []*ent.RuleChan `json:"list"`
 }
 
 type SetStatusChan struct {
-	ID     string      `json:"id"`
-	Status *ChanStatus `json:"status"`
+	ID     uint64     `json:"id"`
+	Status ChanStatus `json:"status"`
 }
 
 type Version struct {

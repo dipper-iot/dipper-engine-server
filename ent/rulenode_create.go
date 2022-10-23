@@ -41,6 +41,12 @@ func (rnc *RuleNodeCreate) SetNodeID(s string) *RuleNodeCreate {
 	return rnc
 }
 
+// SetRuleID sets the "rule_id" field.
+func (rnc *RuleNodeCreate) SetRuleID(s string) *RuleNodeCreate {
+	rnc.mutation.SetRuleID(s)
+	return rnc
+}
+
 // SetOption sets the "option" field.
 func (rnc *RuleNodeCreate) SetOption(m map[string]interface{}) *RuleNodeCreate {
 	rnc.mutation.SetOption(m)
@@ -241,6 +247,14 @@ func (rnc *RuleNodeCreate) check() error {
 			return &ValidationError{Name: "node_id", err: fmt.Errorf(`ent: validator failed for field "RuleNode.node_id": %w`, err)}
 		}
 	}
+	if _, ok := rnc.mutation.RuleID(); !ok {
+		return &ValidationError{Name: "rule_id", err: errors.New(`ent: missing required field "RuleNode.rule_id"`)}
+	}
+	if v, ok := rnc.mutation.RuleID(); ok {
+		if err := rulenode.RuleIDValidator(v); err != nil {
+			return &ValidationError{Name: "rule_id", err: fmt.Errorf(`ent: validator failed for field "RuleNode.rule_id": %w`, err)}
+		}
+	}
 	if _, ok := rnc.mutation.Option(); !ok {
 		return &ValidationError{Name: "option", err: errors.New(`ent: missing required field "RuleNode.option"`)}
 	}
@@ -299,6 +313,14 @@ func (rnc *RuleNodeCreate) createSpec() (*RuleNode, *sqlgraph.CreateSpec) {
 			Column: rulenode.FieldNodeID,
 		})
 		_node.NodeID = value
+	}
+	if value, ok := rnc.mutation.RuleID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: rulenode.FieldRuleID,
+		})
+		_node.RuleID = value
 	}
 	if value, ok := rnc.mutation.Option(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

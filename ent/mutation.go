@@ -855,6 +855,7 @@ type RuleNodeMutation struct {
 	typ           string
 	id            *uint64
 	node_id       *string
+	rule_id       *string
 	option        *map[string]interface{}
 	infinite      *bool
 	debug         *bool
@@ -1056,6 +1057,42 @@ func (m *RuleNodeMutation) OldNodeID(ctx context.Context) (v string, err error) 
 // ResetNodeID resets all changes to the "node_id" field.
 func (m *RuleNodeMutation) ResetNodeID() {
 	m.node_id = nil
+}
+
+// SetRuleID sets the "rule_id" field.
+func (m *RuleNodeMutation) SetRuleID(s string) {
+	m.rule_id = &s
+}
+
+// RuleID returns the value of the "rule_id" field in the mutation.
+func (m *RuleNodeMutation) RuleID() (r string, exists bool) {
+	v := m.rule_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRuleID returns the old "rule_id" field's value of the RuleNode entity.
+// If the RuleNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RuleNodeMutation) OldRuleID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRuleID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRuleID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRuleID: %w", err)
+	}
+	return oldValue.RuleID, nil
+}
+
+// ResetRuleID resets all changes to the "rule_id" field.
+func (m *RuleNodeMutation) ResetRuleID() {
+	m.rule_id = nil
 }
 
 // SetOption sets the "option" field.
@@ -1319,12 +1356,15 @@ func (m *RuleNodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RuleNodeMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.chain != nil {
 		fields = append(fields, rulenode.FieldChainID)
 	}
 	if m.node_id != nil {
 		fields = append(fields, rulenode.FieldNodeID)
+	}
+	if m.rule_id != nil {
+		fields = append(fields, rulenode.FieldRuleID)
 	}
 	if m.option != nil {
 		fields = append(fields, rulenode.FieldOption)
@@ -1356,6 +1396,8 @@ func (m *RuleNodeMutation) Field(name string) (ent.Value, bool) {
 		return m.ChainID()
 	case rulenode.FieldNodeID:
 		return m.NodeID()
+	case rulenode.FieldRuleID:
+		return m.RuleID()
 	case rulenode.FieldOption:
 		return m.Option()
 	case rulenode.FieldInfinite:
@@ -1381,6 +1423,8 @@ func (m *RuleNodeMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldChainID(ctx)
 	case rulenode.FieldNodeID:
 		return m.OldNodeID(ctx)
+	case rulenode.FieldRuleID:
+		return m.OldRuleID(ctx)
 	case rulenode.FieldOption:
 		return m.OldOption(ctx)
 	case rulenode.FieldInfinite:
@@ -1415,6 +1459,13 @@ func (m *RuleNodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNodeID(v)
+		return nil
+	case rulenode.FieldRuleID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRuleID(v)
 		return nil
 	case rulenode.FieldOption:
 		v, ok := value.(map[string]interface{})
@@ -1524,6 +1575,9 @@ func (m *RuleNodeMutation) ResetField(name string) error {
 		return nil
 	case rulenode.FieldNodeID:
 		m.ResetNodeID()
+		return nil
+	case rulenode.FieldRuleID:
+		m.ResetRuleID()
 		return nil
 	case rulenode.FieldOption:
 		m.ResetOption()

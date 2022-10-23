@@ -37,10 +37,12 @@ func (c ChanServiceImpl) List(ctx context.Context, req *models.ListChanRequest) 
 
 	go func() {
 		total, errTotal = query.Clone().Count(ctx)
+		wg.Done()
 	}()
 
 	go func() {
 		list, errList = query.Clone().Limit(req.Limit).Offset(req.Skip).All(ctx)
+		wg.Done()
 	}()
 
 	wg.Wait()
@@ -75,6 +77,7 @@ func (c ChanServiceImpl) Create(ctx context.Context, data *models.Chan) (err err
 		query.SetRootNode(data.NodeRoot)
 	}
 	query.SetDescription(data.Description)
+	query.SetStatus(rulechan.StatusActivated)
 
 	_, err = query.Save(ctx)
 	return

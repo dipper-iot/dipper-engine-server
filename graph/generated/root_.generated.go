@@ -46,6 +46,7 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Infinite    func(childComplexity int) int
 		Name        func(childComplexity int) int
+		Nodes       func(childComplexity int) int
 		RootNode    func(childComplexity int) int
 		Status      func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
@@ -59,14 +60,31 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateChan         func(childComplexity int, input model.InputChan) int
 		DeleteChan         func(childComplexity int, id uint64) int
+		DeleteNode         func(childComplexity int, id uint64) int
 		UpdateChan         func(childComplexity int, id uint64, input model.InputChan) int
+		UpdateNode         func(childComplexity int, chanID uint64, input model.InputNode) int
+		UpdateNodes        func(childComplexity int, chanID uint64, input []*model.InputNode) int
 		UpdateRootNodeChan func(childComplexity int, id uint64, rootNode string) int
 		UpdateStatusChan   func(childComplexity int, input model.SetStatusChan) int
 		Version            func(childComplexity int) int
 	}
 
+	Node struct {
+		ChainID   func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		Debug     func(childComplexity int) int
+		End       func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Infinite  func(childComplexity int) int
+		NodeID    func(childComplexity int) int
+		Option    func(childComplexity int) int
+		RuleID    func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+	}
+
 	Query struct {
 		GetChan  func(childComplexity int, id uint64) int
+		GetNode  func(childComplexity int, id uint64) int
 		ListChan func(childComplexity int, input models.ListChanRequest) int
 		Version  func(childComplexity int) int
 	}
@@ -125,6 +143,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Chan.Name(childComplexity), true
+
+	case "Chan.nodes":
+		if e.complexity.Chan.Nodes == nil {
+			break
+		}
+
+		return e.complexity.Chan.Nodes(childComplexity), true
 
 	case "Chan.root_node":
 		if e.complexity.Chan.RootNode == nil {
@@ -185,6 +210,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteChan(childComplexity, args["id"].(uint64)), true
 
+	case "Mutation.DeleteNode":
+		if e.complexity.Mutation.DeleteNode == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_DeleteNode_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteNode(childComplexity, args["id"].(uint64)), true
+
 	case "Mutation.UpdateChan":
 		if e.complexity.Mutation.UpdateChan == nil {
 			break
@@ -196,6 +233,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateChan(childComplexity, args["id"].(uint64), args["input"].(model.InputChan)), true
+
+	case "Mutation.UpdateNode":
+		if e.complexity.Mutation.UpdateNode == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_UpdateNode_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateNode(childComplexity, args["chanId"].(uint64), args["input"].(model.InputNode)), true
+
+	case "Mutation.UpdateNodes":
+		if e.complexity.Mutation.UpdateNodes == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_UpdateNodes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateNodes(childComplexity, args["chanId"].(uint64), args["input"].([]*model.InputNode)), true
 
 	case "Mutation.UpdateRootNodeChan":
 		if e.complexity.Mutation.UpdateRootNodeChan == nil {
@@ -228,6 +289,76 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Version(childComplexity), true
 
+	case "Node.chain_id":
+		if e.complexity.Node.ChainID == nil {
+			break
+		}
+
+		return e.complexity.Node.ChainID(childComplexity), true
+
+	case "Node.created_at":
+		if e.complexity.Node.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Node.CreatedAt(childComplexity), true
+
+	case "Node.debug":
+		if e.complexity.Node.Debug == nil {
+			break
+		}
+
+		return e.complexity.Node.Debug(childComplexity), true
+
+	case "Node.end":
+		if e.complexity.Node.End == nil {
+			break
+		}
+
+		return e.complexity.Node.End(childComplexity), true
+
+	case "Node.id":
+		if e.complexity.Node.ID == nil {
+			break
+		}
+
+		return e.complexity.Node.ID(childComplexity), true
+
+	case "Node.infinite":
+		if e.complexity.Node.Infinite == nil {
+			break
+		}
+
+		return e.complexity.Node.Infinite(childComplexity), true
+
+	case "Node.node_id":
+		if e.complexity.Node.NodeID == nil {
+			break
+		}
+
+		return e.complexity.Node.NodeID(childComplexity), true
+
+	case "Node.option":
+		if e.complexity.Node.Option == nil {
+			break
+		}
+
+		return e.complexity.Node.Option(childComplexity), true
+
+	case "Node.rule_id":
+		if e.complexity.Node.RuleID == nil {
+			break
+		}
+
+		return e.complexity.Node.RuleID(childComplexity), true
+
+	case "Node.updated_at":
+		if e.complexity.Node.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Node.UpdatedAt(childComplexity), true
+
 	case "Query.GetChan":
 		if e.complexity.Query.GetChan == nil {
 			break
@@ -239,6 +370,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetChan(childComplexity, args["id"].(uint64)), true
+
+	case "Query.GetNode":
+		if e.complexity.Query.GetNode == nil {
+			break
+		}
+
+		args, err := ec.field_Query_GetNode_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetNode(childComplexity, args["id"].(uint64)), true
 
 	case "Query.ListChan":
 		if e.complexity.Query.ListChan == nil {
@@ -275,6 +418,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputInputChan,
+		ec.unmarshalInputInputNode,
 		ec.unmarshalInputListChanRequest,
 		ec.unmarshalInputSetStatusChan,
 	)
@@ -342,7 +486,10 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 
 scalar Uint64
+scalar Timestamp
 scalar Map
+scalar Time
+scalar Any
 
 type Version {
     version: String!
@@ -373,10 +520,11 @@ type Mutation {
     name: String!
     description: String
     root_node: String
+    nodes: [Node!]
     infinite: Boolean
     status: ChanStatus
-    created_at: String
-    updated_at: String
+    created_at: Time
+    updated_at: Time
 }
 
 enum ChanStatus {
@@ -400,8 +548,38 @@ input InputChan {
 }
 
 input SetStatusChan {
-    id: ID!
-    status: ChanStatus
+    id: Uint64!
+    status: ChanStatus!
 }`, BuiltIn: false},
+	{Name: "../schema/node/node.mutation.graphql", Input: `extend type Mutation {
+    UpdateNode(chanId: Uint64!, input: InputNode!): Boolean!
+    UpdateNodes(chanId: Uint64!, input: [InputNode!]): Boolean!
+    DeleteNode(id: Uint64!): Boolean!
+}`, BuiltIn: false},
+	{Name: "../schema/node/node.query.graphql", Input: `extend type Query {
+    GetNode(id: Uint64!): Node!
+}`, BuiltIn: false},
+	{Name: "../schema/node/node.type.graphql", Input: `type Node {
+    id : Uint64!
+    node_id: String!
+    chain_id: Uint64!
+    rule_id: String!
+    option: Map
+    infinite: Boolean!
+    debug: Boolean!
+    end: Boolean!
+    created_at: Time
+    updated_at: Time
+}
+
+input InputNode {
+    node_id: String!
+    rule_id: String!
+    option: Map
+    infinite: Boolean
+    debug: Boolean
+    end: Boolean
+}`, BuiltIn: false},
+	{Name: "../schema/session/session.type.graphql", Input: ``, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

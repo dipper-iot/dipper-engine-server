@@ -15,6 +15,8 @@ const (
 	FieldChainID = "chain_id"
 	// FieldNodeID holds the string denoting the node_id field in the database.
 	FieldNodeID = "node_id"
+	// FieldRuleID holds the string denoting the rule_id field in the database.
+	FieldRuleID = "rule_id"
 	// FieldOption holds the string denoting the option field in the database.
 	FieldOption = "option"
 	// FieldInfinite holds the string denoting the infinite field in the database.
@@ -45,6 +47,7 @@ var Columns = []string{
 	FieldID,
 	FieldChainID,
 	FieldNodeID,
+	FieldRuleID,
 	FieldOption,
 	FieldInfinite,
 	FieldDebug,
@@ -66,6 +69,8 @@ func ValidColumn(column string) bool {
 var (
 	// NodeIDValidator is a validator for the "node_id" field. It is called by the builders before save.
 	NodeIDValidator func(string) error
+	// RuleIDValidator is a validator for the "rule_id" field. It is called by the builders before save.
+	RuleIDValidator func(string) error
 	// DefaultOption holds the default value on creation for the "option" field.
 	DefaultOption map[string]interface{}
 	// DefaultInfinite holds the default value on creation for the "infinite" field.

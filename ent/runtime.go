@@ -89,28 +89,46 @@ func init() {
 			return nil
 		}
 	}()
+	// rulenodeDescRuleID is the schema descriptor for rule_id field.
+	rulenodeDescRuleID := rulenodeFields[3].Descriptor()
+	// rulenode.RuleIDValidator is a validator for the "rule_id" field. It is called by the builders before save.
+	rulenode.RuleIDValidator = func() func(string) error {
+		validators := rulenodeDescRuleID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(rule_id string) error {
+			for _, fn := range fns {
+				if err := fn(rule_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// rulenodeDescOption is the schema descriptor for option field.
-	rulenodeDescOption := rulenodeFields[3].Descriptor()
+	rulenodeDescOption := rulenodeFields[4].Descriptor()
 	// rulenode.DefaultOption holds the default value on creation for the option field.
 	rulenode.DefaultOption = rulenodeDescOption.Default.(map[string]interface{})
 	// rulenodeDescInfinite is the schema descriptor for infinite field.
-	rulenodeDescInfinite := rulenodeFields[4].Descriptor()
+	rulenodeDescInfinite := rulenodeFields[5].Descriptor()
 	// rulenode.DefaultInfinite holds the default value on creation for the infinite field.
 	rulenode.DefaultInfinite = rulenodeDescInfinite.Default.(bool)
 	// rulenodeDescDebug is the schema descriptor for debug field.
-	rulenodeDescDebug := rulenodeFields[5].Descriptor()
+	rulenodeDescDebug := rulenodeFields[6].Descriptor()
 	// rulenode.DefaultDebug holds the default value on creation for the debug field.
 	rulenode.DefaultDebug = rulenodeDescDebug.Default.(bool)
 	// rulenodeDescEnd is the schema descriptor for end field.
-	rulenodeDescEnd := rulenodeFields[6].Descriptor()
+	rulenodeDescEnd := rulenodeFields[7].Descriptor()
 	// rulenode.DefaultEnd holds the default value on creation for the end field.
 	rulenode.DefaultEnd = rulenodeDescEnd.Default.(bool)
 	// rulenodeDescCreatedAt is the schema descriptor for created_at field.
-	rulenodeDescCreatedAt := rulenodeFields[7].Descriptor()
+	rulenodeDescCreatedAt := rulenodeFields[8].Descriptor()
 	// rulenode.DefaultCreatedAt holds the default value on creation for the created_at field.
 	rulenode.DefaultCreatedAt = rulenodeDescCreatedAt.Default.(func() time.Time)
 	// rulenodeDescUpdatedAt is the schema descriptor for updated_at field.
-	rulenodeDescUpdatedAt := rulenodeFields[8].Descriptor()
+	rulenodeDescUpdatedAt := rulenodeFields[9].Descriptor()
 	// rulenode.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	rulenode.DefaultUpdatedAt = rulenodeDescUpdatedAt.Default.(func() time.Time)
 	sessionFields := schema.Session{}.Fields()

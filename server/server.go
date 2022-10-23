@@ -44,7 +44,9 @@ func (s *Server) Init(ctx context.Context) error {
 	s.serverGraph = handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver.NewResolver(s.version, nodeService, chanService, nil)}))
 
 	// router
-	s.router.Handle("/graph/playground", playground.Handler("GraphQL playground of Dipper Engine", "/graph/query"))
+	if s.config.Dev {
+		s.router.Handle("/graph/playground", playground.Handler("GraphQL playground of Dipper Engine", "/graph/query"))
+	}
 	s.router.Handle("/graph/query", s.serverGraph)
 
 	return nil
