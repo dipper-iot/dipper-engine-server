@@ -1,10 +1,13 @@
 GO111MODULE=on
 
+build:
+	go build
+
 ent:
 	go generate ./ent
 
-build:
-	go build
+graph:
+	go generate ./graph
 
 test: build
 	go test -cover ./... -covermode=count -coverprofile=coverage.out

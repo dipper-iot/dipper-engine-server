@@ -107,8 +107,8 @@ func (rnq *RuleNodeQuery) FirstX(ctx context.Context) *RuleNode {
 
 // FirstID returns the first RuleNode ID from the query.
 // Returns a *NotFoundError when no RuleNode ID was found.
-func (rnq *RuleNodeQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rnq *RuleNodeQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = rnq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -120,7 +120,7 @@ func (rnq *RuleNodeQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rnq *RuleNodeQuery) FirstIDX(ctx context.Context) int {
+func (rnq *RuleNodeQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := rnq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -158,8 +158,8 @@ func (rnq *RuleNodeQuery) OnlyX(ctx context.Context) *RuleNode {
 // OnlyID is like Only, but returns the only RuleNode ID in the query.
 // Returns a *NotSingularError when more than one RuleNode ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (rnq *RuleNodeQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rnq *RuleNodeQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = rnq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -175,7 +175,7 @@ func (rnq *RuleNodeQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rnq *RuleNodeQuery) OnlyIDX(ctx context.Context) int {
+func (rnq *RuleNodeQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := rnq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -201,8 +201,8 @@ func (rnq *RuleNodeQuery) AllX(ctx context.Context) []*RuleNode {
 }
 
 // IDs executes the query and returns a list of RuleNode IDs.
-func (rnq *RuleNodeQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (rnq *RuleNodeQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := rnq.Select(rulenode.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -210,7 +210,7 @@ func (rnq *RuleNodeQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rnq *RuleNodeQuery) IDsX(ctx context.Context) []int {
+func (rnq *RuleNodeQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := rnq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -289,7 +289,7 @@ func (rnq *RuleNodeQuery) WithChain(opts ...func(*RuleChanQuery)) *RuleNodeQuery
 // Example:
 //
 //	var v []struct {
-//		ChainID int `json:"chain_id,omitempty"`
+//		ChainID uint64 `json:"chain_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -317,7 +317,7 @@ func (rnq *RuleNodeQuery) GroupBy(field string, fields ...string) *RuleNodeGroup
 // Example:
 //
 //	var v []struct {
-//		ChainID int `json:"chain_id,omitempty"`
+//		ChainID uint64 `json:"chain_id,omitempty"`
 //	}
 //
 //	client.RuleNode.Query().
@@ -383,8 +383,8 @@ func (rnq *RuleNodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ru
 }
 
 func (rnq *RuleNodeQuery) loadChain(ctx context.Context, query *RuleChanQuery, nodes []*RuleNode, init func(*RuleNode), assign func(*RuleNode, *RuleChan)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*RuleNode)
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*RuleNode)
 	for i := range nodes {
 		fk := nodes[i].ChainID
 		if _, ok := nodeids[fk]; !ok {
@@ -435,7 +435,7 @@ func (rnq *RuleNodeQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   rulenode.Table,
 			Columns: rulenode.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: rulenode.FieldID,
 			},
 		},

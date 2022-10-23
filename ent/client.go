@@ -12,6 +12,7 @@ import (
 
 	"github.com/dipper-iot/dipper-engine-server/ent/rulechan"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulenode"
+	"github.com/dipper-iot/dipper-engine-server/ent/session"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -27,6 +28,8 @@ type Client struct {
 	RuleChan *RuleChanClient
 	// RuleNode is the client for interacting with the RuleNode builders.
 	RuleNode *RuleNodeClient
+	// Session is the client for interacting with the Session builders.
+	Session *SessionClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -42,6 +45,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.RuleChan = NewRuleChanClient(c.config)
 	c.RuleNode = NewRuleNodeClient(c.config)
+	c.Session = NewSessionClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -77,6 +81,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:   cfg,
 		RuleChan: NewRuleChanClient(cfg),
 		RuleNode: NewRuleNodeClient(cfg),
+		Session:  NewSessionClient(cfg),
 	}, nil
 }
 
@@ -98,6 +103,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:   cfg,
 		RuleChan: NewRuleChanClient(cfg),
 		RuleNode: NewRuleNodeClient(cfg),
+		Session:  NewSessionClient(cfg),
 	}, nil
 }
 
@@ -128,6 +134,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.RuleChan.Use(hooks...)
 	c.RuleNode.Use(hooks...)
+	c.Session.Use(hooks...)
 }
 
 // RuleChanClient is a client for the RuleChan schema.
@@ -170,7 +177,7 @@ func (c *RuleChanClient) UpdateOne(rc *RuleChan) *RuleChanUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *RuleChanClient) UpdateOneID(id int) *RuleChanUpdateOne {
+func (c *RuleChanClient) UpdateOneID(id uint64) *RuleChanUpdateOne {
 	mutation := newRuleChanMutation(c.config, OpUpdateOne, withRuleChanID(id))
 	return &RuleChanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -187,7 +194,7 @@ func (c *RuleChanClient) DeleteOne(rc *RuleChan) *RuleChanDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *RuleChanClient) DeleteOneID(id int) *RuleChanDeleteOne {
+func (c *RuleChanClient) DeleteOneID(id uint64) *RuleChanDeleteOne {
 	builder := c.Delete().Where(rulechan.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -202,12 +209,12 @@ func (c *RuleChanClient) Query() *RuleChanQuery {
 }
 
 // Get returns a RuleChan entity by its id.
-func (c *RuleChanClient) Get(ctx context.Context, id int) (*RuleChan, error) {
+func (c *RuleChanClient) Get(ctx context.Context, id uint64) (*RuleChan, error) {
 	return c.Query().Where(rulechan.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *RuleChanClient) GetX(ctx context.Context, id int) *RuleChan {
+func (c *RuleChanClient) GetX(ctx context.Context, id uint64) *RuleChan {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -224,6 +231,22 @@ func (c *RuleChanClient) QueryRules(rc *RuleChan) *RuleNodeQuery {
 			sqlgraph.From(rulechan.Table, rulechan.FieldID, id),
 			sqlgraph.To(rulenode.Table, rulenode.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, rulechan.RulesTable, rulechan.RulesColumn),
+		)
+		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySessions queries the sessions edge of a RuleChan.
+func (c *RuleChanClient) QuerySessions(rc *RuleChan) *SessionQuery {
+	query := &SessionQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := rc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rulechan.Table, rulechan.FieldID, id),
+			sqlgraph.To(session.Table, session.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, rulechan.SessionsTable, rulechan.SessionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
 		return fromV, nil
@@ -276,7 +299,7 @@ func (c *RuleNodeClient) UpdateOne(rn *RuleNode) *RuleNodeUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *RuleNodeClient) UpdateOneID(id int) *RuleNodeUpdateOne {
+func (c *RuleNodeClient) UpdateOneID(id uint64) *RuleNodeUpdateOne {
 	mutation := newRuleNodeMutation(c.config, OpUpdateOne, withRuleNodeID(id))
 	return &RuleNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -293,7 +316,7 @@ func (c *RuleNodeClient) DeleteOne(rn *RuleNode) *RuleNodeDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *RuleNodeClient) DeleteOneID(id int) *RuleNodeDeleteOne {
+func (c *RuleNodeClient) DeleteOneID(id uint64) *RuleNodeDeleteOne {
 	builder := c.Delete().Where(rulenode.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -308,12 +331,12 @@ func (c *RuleNodeClient) Query() *RuleNodeQuery {
 }
 
 // Get returns a RuleNode entity by its id.
-func (c *RuleNodeClient) Get(ctx context.Context, id int) (*RuleNode, error) {
+func (c *RuleNodeClient) Get(ctx context.Context, id uint64) (*RuleNode, error) {
 	return c.Query().Where(rulenode.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *RuleNodeClient) GetX(ctx context.Context, id int) *RuleNode {
+func (c *RuleNodeClient) GetX(ctx context.Context, id uint64) *RuleNode {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -340,4 +363,110 @@ func (c *RuleNodeClient) QueryChain(rn *RuleNode) *RuleChanQuery {
 // Hooks returns the client hooks.
 func (c *RuleNodeClient) Hooks() []Hook {
 	return c.hooks.RuleNode
+}
+
+// SessionClient is a client for the Session schema.
+type SessionClient struct {
+	config
+}
+
+// NewSessionClient returns a client for the Session from the given config.
+func NewSessionClient(c config) *SessionClient {
+	return &SessionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `session.Hooks(f(g(h())))`.
+func (c *SessionClient) Use(hooks ...Hook) {
+	c.hooks.Session = append(c.hooks.Session, hooks...)
+}
+
+// Create returns a builder for creating a Session entity.
+func (c *SessionClient) Create() *SessionCreate {
+	mutation := newSessionMutation(c.config, OpCreate)
+	return &SessionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Session entities.
+func (c *SessionClient) CreateBulk(builders ...*SessionCreate) *SessionCreateBulk {
+	return &SessionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Session.
+func (c *SessionClient) Update() *SessionUpdate {
+	mutation := newSessionMutation(c.config, OpUpdate)
+	return &SessionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SessionClient) UpdateOne(s *Session) *SessionUpdateOne {
+	mutation := newSessionMutation(c.config, OpUpdateOne, withSession(s))
+	return &SessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SessionClient) UpdateOneID(id uint64) *SessionUpdateOne {
+	mutation := newSessionMutation(c.config, OpUpdateOne, withSessionID(id))
+	return &SessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Session.
+func (c *SessionClient) Delete() *SessionDelete {
+	mutation := newSessionMutation(c.config, OpDelete)
+	return &SessionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SessionClient) DeleteOne(s *Session) *SessionDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *SessionClient) DeleteOneID(id uint64) *SessionDeleteOne {
+	builder := c.Delete().Where(session.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SessionDeleteOne{builder}
+}
+
+// Query returns a query builder for Session.
+func (c *SessionClient) Query() *SessionQuery {
+	return &SessionQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Session entity by its id.
+func (c *SessionClient) Get(ctx context.Context, id uint64) (*Session, error) {
+	return c.Query().Where(session.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SessionClient) GetX(ctx context.Context, id uint64) *Session {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChain queries the chain edge of a Session.
+func (c *SessionClient) QueryChain(s *Session) *RuleChanQuery {
+	query := &RuleChanQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(session.Table, session.FieldID, id),
+			sqlgraph.To(rulechan.Table, rulechan.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, session.ChainTable, session.ChainColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SessionClient) Hooks() []Hook {
+	return c.hooks.Session
 }

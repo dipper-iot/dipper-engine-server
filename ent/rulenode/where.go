@@ -11,28 +11,28 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.RuleNode {
+func ID(id uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.RuleNode {
+func IDEQ(id uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.RuleNode {
+func IDNEQ(id uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.RuleNode {
+func IDIn(ids ...uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		v := make([]any, len(ids))
 		for i := range v {
@@ -43,7 +43,7 @@ func IDIn(ids ...int) predicate.RuleNode {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.RuleNode {
+func IDNotIn(ids ...uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		v := make([]any, len(ids))
 		for i := range v {
@@ -54,35 +54,35 @@ func IDNotIn(ids ...int) predicate.RuleNode {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.RuleNode {
+func IDGT(id uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.RuleNode {
+func IDGTE(id uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.RuleNode {
+func IDLT(id uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.RuleNode {
+func IDLTE(id uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
 }
 
 // ChainID applies equality check predicate on the "chain_id" field. It's identical to ChainIDEQ.
-func ChainID(v int) predicate.RuleNode {
+func ChainID(v uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldChainID), v))
 	})
@@ -92,6 +92,13 @@ func ChainID(v int) predicate.RuleNode {
 func NodeID(v string) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldNodeID), v))
+	})
+}
+
+// Infinite applies equality check predicate on the "infinite" field. It's identical to InfiniteEQ.
+func Infinite(v bool) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldInfinite), v))
 	})
 }
 
@@ -124,21 +131,21 @@ func UpdatedAt(v time.Time) predicate.RuleNode {
 }
 
 // ChainIDEQ applies the EQ predicate on the "chain_id" field.
-func ChainIDEQ(v int) predicate.RuleNode {
+func ChainIDEQ(v uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldChainID), v))
 	})
 }
 
 // ChainIDNEQ applies the NEQ predicate on the "chain_id" field.
-func ChainIDNEQ(v int) predicate.RuleNode {
+func ChainIDNEQ(v uint64) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldChainID), v))
 	})
 }
 
 // ChainIDIn applies the In predicate on the "chain_id" field.
-func ChainIDIn(vs ...int) predicate.RuleNode {
+func ChainIDIn(vs ...uint64) predicate.RuleNode {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -149,7 +156,7 @@ func ChainIDIn(vs ...int) predicate.RuleNode {
 }
 
 // ChainIDNotIn applies the NotIn predicate on the "chain_id" field.
-func ChainIDNotIn(vs ...int) predicate.RuleNode {
+func ChainIDNotIn(vs ...uint64) predicate.RuleNode {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -269,6 +276,20 @@ func NodeIDEqualFold(v string) predicate.RuleNode {
 func NodeIDContainsFold(v string) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldNodeID), v))
+	})
+}
+
+// InfiniteEQ applies the EQ predicate on the "infinite" field.
+func InfiniteEQ(v bool) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldInfinite), v))
+	})
+}
+
+// InfiniteNEQ applies the NEQ predicate on the "infinite" field.
+func InfiniteNEQ(v bool) predicate.RuleNode {
+	return predicate.RuleNode(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldInfinite), v))
 	})
 }
 

@@ -1,0 +1,4 @@
+extend type Query {
+    ListChan(input: ListChanRequest!): ListChan!
+    GetChan(id: Uint64!): Chan!
+}

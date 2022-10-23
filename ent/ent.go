@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulechan"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulenode"
+	"github.com/dipper-iot/dipper-engine-server/ent/session"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -34,6 +35,7 @@ func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		rulechan.Table: rulechan.ValidColumn,
 		rulenode.Table: rulenode.ValidColumn,
+		session.Table:  session.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

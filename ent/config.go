@@ -26,6 +26,7 @@ type config struct {
 type hooks struct {
 	RuleChan []ent.Hook
 	RuleNode []ent.Hook
+	Session  []ent.Hook
 }
 
 // Options applies the options on the config object.

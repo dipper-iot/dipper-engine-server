@@ -30,15 +30,15 @@ func (rnu *RuleNodeUpdate) Where(ps ...predicate.RuleNode) *RuleNodeUpdate {
 }
 
 // SetChainID sets the "chain_id" field.
-func (rnu *RuleNodeUpdate) SetChainID(i int) *RuleNodeUpdate {
-	rnu.mutation.SetChainID(i)
+func (rnu *RuleNodeUpdate) SetChainID(u uint64) *RuleNodeUpdate {
+	rnu.mutation.SetChainID(u)
 	return rnu
 }
 
 // SetNillableChainID sets the "chain_id" field if the given value is not nil.
-func (rnu *RuleNodeUpdate) SetNillableChainID(i *int) *RuleNodeUpdate {
-	if i != nil {
-		rnu.SetChainID(*i)
+func (rnu *RuleNodeUpdate) SetNillableChainID(u *uint64) *RuleNodeUpdate {
+	if u != nil {
+		rnu.SetChainID(*u)
 	}
 	return rnu
 }
@@ -58,6 +58,20 @@ func (rnu *RuleNodeUpdate) SetNodeID(s string) *RuleNodeUpdate {
 // SetOption sets the "option" field.
 func (rnu *RuleNodeUpdate) SetOption(m map[string]interface{}) *RuleNodeUpdate {
 	rnu.mutation.SetOption(m)
+	return rnu
+}
+
+// SetInfinite sets the "infinite" field.
+func (rnu *RuleNodeUpdate) SetInfinite(b bool) *RuleNodeUpdate {
+	rnu.mutation.SetInfinite(b)
+	return rnu
+}
+
+// SetNillableInfinite sets the "infinite" field if the given value is not nil.
+func (rnu *RuleNodeUpdate) SetNillableInfinite(b *bool) *RuleNodeUpdate {
+	if b != nil {
+		rnu.SetInfinite(*b)
+	}
 	return rnu
 }
 
@@ -209,7 +223,7 @@ func (rnu *RuleNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   rulenode.Table,
 			Columns: rulenode.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: rulenode.FieldID,
 			},
 		},
@@ -233,6 +247,13 @@ func (rnu *RuleNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeJSON,
 			Value:  value,
 			Column: rulenode.FieldOption,
+		})
+	}
+	if value, ok := rnu.mutation.Infinite(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: rulenode.FieldInfinite,
 		})
 	}
 	if value, ok := rnu.mutation.Debug(); ok {
@@ -272,7 +293,7 @@ func (rnu *RuleNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulechan.FieldID,
 				},
 			},
@@ -288,7 +309,7 @@ func (rnu *RuleNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulechan.FieldID,
 				},
 			},
@@ -318,15 +339,15 @@ type RuleNodeUpdateOne struct {
 }
 
 // SetChainID sets the "chain_id" field.
-func (rnuo *RuleNodeUpdateOne) SetChainID(i int) *RuleNodeUpdateOne {
-	rnuo.mutation.SetChainID(i)
+func (rnuo *RuleNodeUpdateOne) SetChainID(u uint64) *RuleNodeUpdateOne {
+	rnuo.mutation.SetChainID(u)
 	return rnuo
 }
 
 // SetNillableChainID sets the "chain_id" field if the given value is not nil.
-func (rnuo *RuleNodeUpdateOne) SetNillableChainID(i *int) *RuleNodeUpdateOne {
-	if i != nil {
-		rnuo.SetChainID(*i)
+func (rnuo *RuleNodeUpdateOne) SetNillableChainID(u *uint64) *RuleNodeUpdateOne {
+	if u != nil {
+		rnuo.SetChainID(*u)
 	}
 	return rnuo
 }
@@ -346,6 +367,20 @@ func (rnuo *RuleNodeUpdateOne) SetNodeID(s string) *RuleNodeUpdateOne {
 // SetOption sets the "option" field.
 func (rnuo *RuleNodeUpdateOne) SetOption(m map[string]interface{}) *RuleNodeUpdateOne {
 	rnuo.mutation.SetOption(m)
+	return rnuo
+}
+
+// SetInfinite sets the "infinite" field.
+func (rnuo *RuleNodeUpdateOne) SetInfinite(b bool) *RuleNodeUpdateOne {
+	rnuo.mutation.SetInfinite(b)
+	return rnuo
+}
+
+// SetNillableInfinite sets the "infinite" field if the given value is not nil.
+func (rnuo *RuleNodeUpdateOne) SetNillableInfinite(b *bool) *RuleNodeUpdateOne {
+	if b != nil {
+		rnuo.SetInfinite(*b)
+	}
 	return rnuo
 }
 
@@ -510,7 +545,7 @@ func (rnuo *RuleNodeUpdateOne) sqlSave(ctx context.Context) (_node *RuleNode, er
 			Table:   rulenode.Table,
 			Columns: rulenode.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: rulenode.FieldID,
 			},
 		},
@@ -553,6 +588,13 @@ func (rnuo *RuleNodeUpdateOne) sqlSave(ctx context.Context) (_node *RuleNode, er
 			Column: rulenode.FieldOption,
 		})
 	}
+	if value, ok := rnuo.mutation.Infinite(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: rulenode.FieldInfinite,
+		})
+	}
 	if value, ok := rnuo.mutation.Debug(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -590,7 +632,7 @@ func (rnuo *RuleNodeUpdateOne) sqlSave(ctx context.Context) (_node *RuleNode, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulechan.FieldID,
 				},
 			},
@@ -606,7 +648,7 @@ func (rnuo *RuleNodeUpdateOne) sqlSave(ctx context.Context) (_node *RuleNode, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulechan.FieldID,
 				},
 			},

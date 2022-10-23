@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulechan"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulenode"
+	"github.com/dipper-iot/dipper-engine-server/ent/session"
 )
 
 // RuleChanCreate is the builder for creating a RuleChan entity.
@@ -27,9 +28,29 @@ func (rcc *RuleChanCreate) SetName(s string) *RuleChanCreate {
 	return rcc
 }
 
+// SetDescription sets the "description" field.
+func (rcc *RuleChanCreate) SetDescription(s string) *RuleChanCreate {
+	rcc.mutation.SetDescription(s)
+	return rcc
+}
+
 // SetRootNode sets the "root_node" field.
 func (rcc *RuleChanCreate) SetRootNode(s string) *RuleChanCreate {
 	rcc.mutation.SetRootNode(s)
+	return rcc
+}
+
+// SetInfinite sets the "infinite" field.
+func (rcc *RuleChanCreate) SetInfinite(b bool) *RuleChanCreate {
+	rcc.mutation.SetInfinite(b)
+	return rcc
+}
+
+// SetNillableInfinite sets the "infinite" field if the given value is not nil.
+func (rcc *RuleChanCreate) SetNillableInfinite(b *bool) *RuleChanCreate {
+	if b != nil {
+		rcc.SetInfinite(*b)
+	}
 	return rcc
 }
 
@@ -67,19 +88,40 @@ func (rcc *RuleChanCreate) SetNillableUpdatedAt(t *time.Time) *RuleChanCreate {
 	return rcc
 }
 
+// SetID sets the "id" field.
+func (rcc *RuleChanCreate) SetID(u uint64) *RuleChanCreate {
+	rcc.mutation.SetID(u)
+	return rcc
+}
+
 // AddRuleIDs adds the "rules" edge to the RuleNode entity by IDs.
-func (rcc *RuleChanCreate) AddRuleIDs(ids ...int) *RuleChanCreate {
+func (rcc *RuleChanCreate) AddRuleIDs(ids ...uint64) *RuleChanCreate {
 	rcc.mutation.AddRuleIDs(ids...)
 	return rcc
 }
 
 // AddRules adds the "rules" edges to the RuleNode entity.
 func (rcc *RuleChanCreate) AddRules(r ...*RuleNode) *RuleChanCreate {
-	ids := make([]int, len(r))
+	ids := make([]uint64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
 	return rcc.AddRuleIDs(ids...)
+}
+
+// AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
+func (rcc *RuleChanCreate) AddSessionIDs(ids ...uint64) *RuleChanCreate {
+	rcc.mutation.AddSessionIDs(ids...)
+	return rcc
+}
+
+// AddSessions adds the "sessions" edges to the Session entity.
+func (rcc *RuleChanCreate) AddSessions(s ...*Session) *RuleChanCreate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcc.AddSessionIDs(ids...)
 }
 
 // Mutation returns the RuleChanMutation object of the builder.
@@ -159,6 +201,10 @@ func (rcc *RuleChanCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rcc *RuleChanCreate) defaults() {
+	if _, ok := rcc.mutation.Infinite(); !ok {
+		v := rulechan.DefaultInfinite
+		rcc.mutation.SetInfinite(v)
+	}
 	if _, ok := rcc.mutation.CreatedAt(); !ok {
 		v := rulechan.DefaultCreatedAt()
 		rcc.mutation.SetCreatedAt(v)
@@ -179,6 +225,14 @@ func (rcc *RuleChanCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "RuleChan.name": %w`, err)}
 		}
 	}
+	if _, ok := rcc.mutation.Description(); !ok {
+		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "RuleChan.description"`)}
+	}
+	if v, ok := rcc.mutation.Description(); ok {
+		if err := rulechan.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "RuleChan.description": %w`, err)}
+		}
+	}
 	if _, ok := rcc.mutation.RootNode(); !ok {
 		return &ValidationError{Name: "root_node", err: errors.New(`ent: missing required field "RuleChan.root_node"`)}
 	}
@@ -186,6 +240,9 @@ func (rcc *RuleChanCreate) check() error {
 		if err := rulechan.RootNodeValidator(v); err != nil {
 			return &ValidationError{Name: "root_node", err: fmt.Errorf(`ent: validator failed for field "RuleChan.root_node": %w`, err)}
 		}
+	}
+	if _, ok := rcc.mutation.Infinite(); !ok {
+		return &ValidationError{Name: "infinite", err: errors.New(`ent: missing required field "RuleChan.infinite"`)}
 	}
 	if _, ok := rcc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "RuleChan.status"`)}
@@ -212,8 +269,10 @@ func (rcc *RuleChanCreate) sqlSave(ctx context.Context) (*RuleChan, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint64(id)
+	}
 	return _node, nil
 }
 
@@ -223,11 +282,15 @@ func (rcc *RuleChanCreate) createSpec() (*RuleChan, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: rulechan.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: rulechan.FieldID,
 			},
 		}
 	)
+	if id, ok := rcc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := rcc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -236,6 +299,14 @@ func (rcc *RuleChanCreate) createSpec() (*RuleChan, *sqlgraph.CreateSpec) {
 		})
 		_node.Name = value
 	}
+	if value, ok := rcc.mutation.Description(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: rulechan.FieldDescription,
+		})
+		_node.Description = &value
+	}
 	if value, ok := rcc.mutation.RootNode(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -243,6 +314,14 @@ func (rcc *RuleChanCreate) createSpec() (*RuleChan, *sqlgraph.CreateSpec) {
 			Column: rulechan.FieldRootNode,
 		})
 		_node.RootNode = value
+	}
+	if value, ok := rcc.mutation.Infinite(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: rulechan.FieldInfinite,
+		})
+		_node.Infinite = value
 	}
 	if value, ok := rcc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -277,8 +356,27 @@ func (rcc *RuleChanCreate) createSpec() (*RuleChan, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulenode.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rcc.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   rulechan.SessionsTable,
+			Columns: []string{rulechan.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: session.FieldID,
 				},
 			},
 		}
@@ -331,9 +429,9 @@ func (rccb *RuleChanCreateBulk) Save(ctx context.Context) ([]*RuleChan, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

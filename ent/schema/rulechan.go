@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/dipper-iot/dipper-engine-server/constants"
 	"time"
 )
 
@@ -17,8 +18,11 @@ type RuleChan struct {
 // Fields of the RuleChan.
 func (RuleChan) Fields() []ent.Field {
 	return []ent.Field{
+		field.Uint64("id").Unique().Immutable(),
 		field.String("name").NotEmpty().MaxLen(256),
+		field.String("description").Nillable().MaxLen(1000),
 		field.String("root_node").NotEmpty().MaxLen(256),
+		field.Bool("infinite").Default(false),
 		field.Enum("status").NamedValues("activated", "deactivated"),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now),
@@ -29,11 +33,12 @@ func (RuleChan) Fields() []ent.Field {
 func (RuleChan) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("rules", RuleNode.Type),
+		edge.To("sessions", Session.Type),
 	}
 }
 
 func (RuleChan) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "rule_chan"},
+		entsql.Annotation{Table: constants.ChanTable},
 	}
 }

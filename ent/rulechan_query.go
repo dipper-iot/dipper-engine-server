@@ -14,18 +14,20 @@ import (
 	"github.com/dipper-iot/dipper-engine-server/ent/predicate"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulechan"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulenode"
+	"github.com/dipper-iot/dipper-engine-server/ent/session"
 )
 
 // RuleChanQuery is the builder for querying RuleChan entities.
 type RuleChanQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
-	predicates []predicate.RuleChan
-	withRules  *RuleNodeQuery
+	limit        *int
+	offset       *int
+	unique       *bool
+	order        []OrderFunc
+	fields       []string
+	predicates   []predicate.RuleChan
+	withRules    *RuleNodeQuery
+	withSessions *SessionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -84,6 +86,28 @@ func (rcq *RuleChanQuery) QueryRules() *RuleNodeQuery {
 	return query
 }
 
+// QuerySessions chains the current query on the "sessions" edge.
+func (rcq *RuleChanQuery) QuerySessions() *SessionQuery {
+	query := &SessionQuery{config: rcq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rcq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rcq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rulechan.Table, rulechan.FieldID, selector),
+			sqlgraph.To(session.Table, session.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, rulechan.SessionsTable, rulechan.SessionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rcq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first RuleChan entity from the query.
 // Returns a *NotFoundError when no RuleChan was found.
 func (rcq *RuleChanQuery) First(ctx context.Context) (*RuleChan, error) {
@@ -108,8 +132,8 @@ func (rcq *RuleChanQuery) FirstX(ctx context.Context) *RuleChan {
 
 // FirstID returns the first RuleChan ID from the query.
 // Returns a *NotFoundError when no RuleChan ID was found.
-func (rcq *RuleChanQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rcq *RuleChanQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = rcq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -121,7 +145,7 @@ func (rcq *RuleChanQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rcq *RuleChanQuery) FirstIDX(ctx context.Context) int {
+func (rcq *RuleChanQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := rcq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -159,8 +183,8 @@ func (rcq *RuleChanQuery) OnlyX(ctx context.Context) *RuleChan {
 // OnlyID is like Only, but returns the only RuleChan ID in the query.
 // Returns a *NotSingularError when more than one RuleChan ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (rcq *RuleChanQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rcq *RuleChanQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = rcq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -176,7 +200,7 @@ func (rcq *RuleChanQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rcq *RuleChanQuery) OnlyIDX(ctx context.Context) int {
+func (rcq *RuleChanQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := rcq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -202,8 +226,8 @@ func (rcq *RuleChanQuery) AllX(ctx context.Context) []*RuleChan {
 }
 
 // IDs executes the query and returns a list of RuleChan IDs.
-func (rcq *RuleChanQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (rcq *RuleChanQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	if err := rcq.Select(rulechan.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -211,7 +235,7 @@ func (rcq *RuleChanQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rcq *RuleChanQuery) IDsX(ctx context.Context) []int {
+func (rcq *RuleChanQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := rcq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -260,12 +284,13 @@ func (rcq *RuleChanQuery) Clone() *RuleChanQuery {
 		return nil
 	}
 	return &RuleChanQuery{
-		config:     rcq.config,
-		limit:      rcq.limit,
-		offset:     rcq.offset,
-		order:      append([]OrderFunc{}, rcq.order...),
-		predicates: append([]predicate.RuleChan{}, rcq.predicates...),
-		withRules:  rcq.withRules.Clone(),
+		config:       rcq.config,
+		limit:        rcq.limit,
+		offset:       rcq.offset,
+		order:        append([]OrderFunc{}, rcq.order...),
+		predicates:   append([]predicate.RuleChan{}, rcq.predicates...),
+		withRules:    rcq.withRules.Clone(),
+		withSessions: rcq.withSessions.Clone(),
 		// clone intermediate query.
 		sql:    rcq.sql.Clone(),
 		path:   rcq.path,
@@ -281,6 +306,17 @@ func (rcq *RuleChanQuery) WithRules(opts ...func(*RuleNodeQuery)) *RuleChanQuery
 		opt(query)
 	}
 	rcq.withRules = query
+	return rcq
+}
+
+// WithSessions tells the query-builder to eager-load the nodes that are connected to
+// the "sessions" edge. The optional arguments are used to configure the query builder of the edge.
+func (rcq *RuleChanQuery) WithSessions(opts ...func(*SessionQuery)) *RuleChanQuery {
+	query := &SessionQuery{config: rcq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	rcq.withSessions = query
 	return rcq
 }
 
@@ -352,8 +388,9 @@ func (rcq *RuleChanQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ru
 	var (
 		nodes       = []*RuleChan{}
 		_spec       = rcq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			rcq.withRules != nil,
+			rcq.withSessions != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -381,12 +418,19 @@ func (rcq *RuleChanQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ru
 			return nil, err
 		}
 	}
+	if query := rcq.withSessions; query != nil {
+		if err := rcq.loadSessions(ctx, query, nodes,
+			func(n *RuleChan) { n.Edges.Sessions = []*Session{} },
+			func(n *RuleChan, e *Session) { n.Edges.Sessions = append(n.Edges.Sessions, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
 func (rcq *RuleChanQuery) loadRules(ctx context.Context, query *RuleNodeQuery, nodes []*RuleChan, init func(*RuleChan), assign func(*RuleChan, *RuleNode)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*RuleChan)
+	nodeids := make(map[uint64]*RuleChan)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -396,6 +440,33 @@ func (rcq *RuleChanQuery) loadRules(ctx context.Context, query *RuleNodeQuery, n
 	}
 	query.Where(predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.InValues(rulechan.RulesColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ChainID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "chain_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (rcq *RuleChanQuery) loadSessions(ctx context.Context, query *SessionQuery, nodes []*RuleChan, init func(*RuleChan), assign func(*RuleChan, *Session)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint64]*RuleChan)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.Where(predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.InValues(rulechan.SessionsColumn, fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -438,7 +509,7 @@ func (rcq *RuleChanQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   rulechan.Table,
 			Columns: rulechan.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: rulechan.FieldID,
 			},
 		},

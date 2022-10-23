@@ -1,0 +1,7 @@
+extend type Mutation {
+    CreateChan(input: InputChan!): Boolean!
+    UpdateChan(id: Uint64!, input: InputChan!): Boolean!
+    UpdateStatusChan(input: SetStatusChan!): Boolean!
+    UpdateRootNodeChan(id: Uint64!, rootNode: String!): Boolean!
+    DeleteChan(id: Uint64!): Boolean!
+}

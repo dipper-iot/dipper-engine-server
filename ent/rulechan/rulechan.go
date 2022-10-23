@@ -14,8 +14,12 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
 	// FieldRootNode holds the string denoting the root_node field in the database.
 	FieldRootNode = "root_node"
+	// FieldInfinite holds the string denoting the infinite field in the database.
+	FieldInfinite = "infinite"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -24,6 +28,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeRules holds the string denoting the rules edge name in mutations.
 	EdgeRules = "rules"
+	// EdgeSessions holds the string denoting the sessions edge name in mutations.
+	EdgeSessions = "sessions"
 	// Table holds the table name of the rulechan in the database.
 	Table = "rule_chan"
 	// RulesTable is the table that holds the rules relation/edge.
@@ -33,13 +39,22 @@ const (
 	RulesInverseTable = "rule_nodes"
 	// RulesColumn is the table column denoting the rules relation/edge.
 	RulesColumn = "chain_id"
+	// SessionsTable is the table that holds the sessions relation/edge.
+	SessionsTable = "sessions"
+	// SessionsInverseTable is the table name for the Session entity.
+	// It exists in this package in order to avoid circular dependency with the "session" package.
+	SessionsInverseTable = "sessions"
+	// SessionsColumn is the table column denoting the sessions relation/edge.
+	SessionsColumn = "chain_id"
 )
 
 // Columns holds all SQL columns for rulechan fields.
 var Columns = []string{
 	FieldID,
 	FieldName,
+	FieldDescription,
 	FieldRootNode,
+	FieldInfinite,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -58,8 +73,12 @@ func ValidColumn(column string) bool {
 var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	DescriptionValidator func(string) error
 	// RootNodeValidator is a validator for the "root_node" field. It is called by the builders before save.
 	RootNodeValidator func(string) error
+	// DefaultInfinite holds the default value on creation for the "infinite" field.
+	DefaultInfinite bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

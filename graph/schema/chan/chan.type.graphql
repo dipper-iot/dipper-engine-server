@@ -1,0 +1,35 @@
+type Chan {
+    id: Uint64!
+    name: String!
+    description: String
+    root_node: String
+    infinite: Boolean
+    status: ChanStatus
+    created_at: String
+    updated_at: String
+}
+
+enum ChanStatus {
+    Activated
+    Deactivated
+}
+
+type ListChan {
+    total: Int!
+    list: [Chan]
+}
+
+input ListChanRequest {
+    skip: Int!
+    limit: Int!
+}
+
+input InputChan {
+    name: String!
+    description: String
+}
+
+input SetStatusChan {
+    id: ID!
+    status: ChanStatus
+}

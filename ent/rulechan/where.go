@@ -11,28 +11,28 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.RuleChan {
+func ID(id uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.RuleChan {
+func IDEQ(id uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.RuleChan {
+func IDNEQ(id uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.RuleChan {
+func IDIn(ids ...uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		v := make([]any, len(ids))
 		for i := range v {
@@ -43,7 +43,7 @@ func IDIn(ids ...int) predicate.RuleChan {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.RuleChan {
+func IDNotIn(ids ...uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		v := make([]any, len(ids))
 		for i := range v {
@@ -54,28 +54,28 @@ func IDNotIn(ids ...int) predicate.RuleChan {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.RuleChan {
+func IDGT(id uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.RuleChan {
+func IDGTE(id uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.RuleChan {
+func IDLT(id uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.RuleChan {
+func IDLTE(id uint64) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -88,10 +88,24 @@ func Name(v string) predicate.RuleChan {
 	})
 }
 
+// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
+func Description(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDescription), v))
+	})
+}
+
 // RootNode applies equality check predicate on the "root_node" field. It's identical to RootNodeEQ.
 func RootNode(v string) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRootNode), v))
+	})
+}
+
+// Infinite applies equality check predicate on the "infinite" field. It's identical to InfiniteEQ.
+func Infinite(v bool) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldInfinite), v))
 	})
 }
 
@@ -208,6 +222,105 @@ func NameContainsFold(v string) predicate.RuleChan {
 	})
 }
 
+// DescriptionEQ applies the EQ predicate on the "description" field.
+func DescriptionEQ(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionNEQ applies the NEQ predicate on the "description" field.
+func DescriptionNEQ(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionIn applies the In predicate on the "description" field.
+func DescriptionIn(vs ...string) predicate.RuleChan {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldDescription), v...))
+	})
+}
+
+// DescriptionNotIn applies the NotIn predicate on the "description" field.
+func DescriptionNotIn(vs ...string) predicate.RuleChan {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldDescription), v...))
+	})
+}
+
+// DescriptionGT applies the GT predicate on the "description" field.
+func DescriptionGT(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionGTE applies the GTE predicate on the "description" field.
+func DescriptionGTE(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionLT applies the LT predicate on the "description" field.
+func DescriptionLT(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionLTE applies the LTE predicate on the "description" field.
+func DescriptionLTE(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionContains applies the Contains predicate on the "description" field.
+func DescriptionContains(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
+func DescriptionHasPrefix(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
+func DescriptionHasSuffix(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
+func DescriptionEqualFold(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldDescription), v))
+	})
+}
+
+// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
+func DescriptionContainsFold(v string) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldDescription), v))
+	})
+}
+
 // RootNodeEQ applies the EQ predicate on the "root_node" field.
 func RootNodeEQ(v string) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
@@ -304,6 +417,20 @@ func RootNodeEqualFold(v string) predicate.RuleChan {
 func RootNodeContainsFold(v string) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldRootNode), v))
+	})
+}
+
+// InfiniteEQ applies the EQ predicate on the "infinite" field.
+func InfiniteEQ(v bool) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldInfinite), v))
+	})
+}
+
+// InfiniteNEQ applies the NEQ predicate on the "infinite" field.
+func InfiniteNEQ(v bool) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldInfinite), v))
 	})
 }
 
@@ -490,6 +617,34 @@ func HasRulesWith(preds ...predicate.RuleNode) predicate.RuleChan {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(RulesInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, RulesTable, RulesColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSessions applies the HasEdge predicate on the "sessions" edge.
+func HasSessions() predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(SessionsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SessionsTable, SessionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSessionsWith applies the HasEdge predicate on the "sessions" edge with a given conditions (other predicates).
+func HasSessionsWith(preds ...predicate.Session) predicate.RuleChan {
+	return predicate.RuleChan(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(SessionsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SessionsTable, SessionsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

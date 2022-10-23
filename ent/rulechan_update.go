@@ -14,6 +14,7 @@ import (
 	"github.com/dipper-iot/dipper-engine-server/ent/predicate"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulechan"
 	"github.com/dipper-iot/dipper-engine-server/ent/rulenode"
+	"github.com/dipper-iot/dipper-engine-server/ent/session"
 )
 
 // RuleChanUpdate is the builder for updating RuleChan entities.
@@ -35,9 +36,29 @@ func (rcu *RuleChanUpdate) SetName(s string) *RuleChanUpdate {
 	return rcu
 }
 
+// SetDescription sets the "description" field.
+func (rcu *RuleChanUpdate) SetDescription(s string) *RuleChanUpdate {
+	rcu.mutation.SetDescription(s)
+	return rcu
+}
+
 // SetRootNode sets the "root_node" field.
 func (rcu *RuleChanUpdate) SetRootNode(s string) *RuleChanUpdate {
 	rcu.mutation.SetRootNode(s)
+	return rcu
+}
+
+// SetInfinite sets the "infinite" field.
+func (rcu *RuleChanUpdate) SetInfinite(b bool) *RuleChanUpdate {
+	rcu.mutation.SetInfinite(b)
+	return rcu
+}
+
+// SetNillableInfinite sets the "infinite" field if the given value is not nil.
+func (rcu *RuleChanUpdate) SetNillableInfinite(b *bool) *RuleChanUpdate {
+	if b != nil {
+		rcu.SetInfinite(*b)
+	}
 	return rcu
 }
 
@@ -76,18 +97,33 @@ func (rcu *RuleChanUpdate) SetNillableUpdatedAt(t *time.Time) *RuleChanUpdate {
 }
 
 // AddRuleIDs adds the "rules" edge to the RuleNode entity by IDs.
-func (rcu *RuleChanUpdate) AddRuleIDs(ids ...int) *RuleChanUpdate {
+func (rcu *RuleChanUpdate) AddRuleIDs(ids ...uint64) *RuleChanUpdate {
 	rcu.mutation.AddRuleIDs(ids...)
 	return rcu
 }
 
 // AddRules adds the "rules" edges to the RuleNode entity.
 func (rcu *RuleChanUpdate) AddRules(r ...*RuleNode) *RuleChanUpdate {
-	ids := make([]int, len(r))
+	ids := make([]uint64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
 	return rcu.AddRuleIDs(ids...)
+}
+
+// AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
+func (rcu *RuleChanUpdate) AddSessionIDs(ids ...uint64) *RuleChanUpdate {
+	rcu.mutation.AddSessionIDs(ids...)
+	return rcu
+}
+
+// AddSessions adds the "sessions" edges to the Session entity.
+func (rcu *RuleChanUpdate) AddSessions(s ...*Session) *RuleChanUpdate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcu.AddSessionIDs(ids...)
 }
 
 // Mutation returns the RuleChanMutation object of the builder.
@@ -102,18 +138,39 @@ func (rcu *RuleChanUpdate) ClearRules() *RuleChanUpdate {
 }
 
 // RemoveRuleIDs removes the "rules" edge to RuleNode entities by IDs.
-func (rcu *RuleChanUpdate) RemoveRuleIDs(ids ...int) *RuleChanUpdate {
+func (rcu *RuleChanUpdate) RemoveRuleIDs(ids ...uint64) *RuleChanUpdate {
 	rcu.mutation.RemoveRuleIDs(ids...)
 	return rcu
 }
 
 // RemoveRules removes "rules" edges to RuleNode entities.
 func (rcu *RuleChanUpdate) RemoveRules(r ...*RuleNode) *RuleChanUpdate {
-	ids := make([]int, len(r))
+	ids := make([]uint64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
 	return rcu.RemoveRuleIDs(ids...)
+}
+
+// ClearSessions clears all "sessions" edges to the Session entity.
+func (rcu *RuleChanUpdate) ClearSessions() *RuleChanUpdate {
+	rcu.mutation.ClearSessions()
+	return rcu
+}
+
+// RemoveSessionIDs removes the "sessions" edge to Session entities by IDs.
+func (rcu *RuleChanUpdate) RemoveSessionIDs(ids ...uint64) *RuleChanUpdate {
+	rcu.mutation.RemoveSessionIDs(ids...)
+	return rcu
+}
+
+// RemoveSessions removes "sessions" edges to Session entities.
+func (rcu *RuleChanUpdate) RemoveSessions(s ...*Session) *RuleChanUpdate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcu.RemoveSessionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -183,6 +240,11 @@ func (rcu *RuleChanUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "RuleChan.name": %w`, err)}
 		}
 	}
+	if v, ok := rcu.mutation.Description(); ok {
+		if err := rulechan.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "RuleChan.description": %w`, err)}
+		}
+	}
 	if v, ok := rcu.mutation.RootNode(); ok {
 		if err := rulechan.RootNodeValidator(v); err != nil {
 			return &ValidationError{Name: "root_node", err: fmt.Errorf(`ent: validator failed for field "RuleChan.root_node": %w`, err)}
@@ -202,7 +264,7 @@ func (rcu *RuleChanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   rulechan.Table,
 			Columns: rulechan.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: rulechan.FieldID,
 			},
 		},
@@ -221,11 +283,25 @@ func (rcu *RuleChanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: rulechan.FieldName,
 		})
 	}
+	if value, ok := rcu.mutation.Description(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: rulechan.FieldDescription,
+		})
+	}
 	if value, ok := rcu.mutation.RootNode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: rulechan.FieldRootNode,
+		})
+	}
+	if value, ok := rcu.mutation.Infinite(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: rulechan.FieldInfinite,
 		})
 	}
 	if value, ok := rcu.mutation.Status(); ok {
@@ -258,7 +334,7 @@ func (rcu *RuleChanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulenode.FieldID,
 				},
 			},
@@ -274,7 +350,7 @@ func (rcu *RuleChanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulenode.FieldID,
 				},
 			},
@@ -293,8 +369,62 @@ func (rcu *RuleChanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulenode.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if rcu.mutation.SessionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   rulechan.SessionsTable,
+			Columns: []string{rulechan.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: session.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcu.mutation.RemovedSessionsIDs(); len(nodes) > 0 && !rcu.mutation.SessionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   rulechan.SessionsTable,
+			Columns: []string{rulechan.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: session.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcu.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   rulechan.SessionsTable,
+			Columns: []string{rulechan.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: session.FieldID,
 				},
 			},
 		}
@@ -328,9 +458,29 @@ func (rcuo *RuleChanUpdateOne) SetName(s string) *RuleChanUpdateOne {
 	return rcuo
 }
 
+// SetDescription sets the "description" field.
+func (rcuo *RuleChanUpdateOne) SetDescription(s string) *RuleChanUpdateOne {
+	rcuo.mutation.SetDescription(s)
+	return rcuo
+}
+
 // SetRootNode sets the "root_node" field.
 func (rcuo *RuleChanUpdateOne) SetRootNode(s string) *RuleChanUpdateOne {
 	rcuo.mutation.SetRootNode(s)
+	return rcuo
+}
+
+// SetInfinite sets the "infinite" field.
+func (rcuo *RuleChanUpdateOne) SetInfinite(b bool) *RuleChanUpdateOne {
+	rcuo.mutation.SetInfinite(b)
+	return rcuo
+}
+
+// SetNillableInfinite sets the "infinite" field if the given value is not nil.
+func (rcuo *RuleChanUpdateOne) SetNillableInfinite(b *bool) *RuleChanUpdateOne {
+	if b != nil {
+		rcuo.SetInfinite(*b)
+	}
 	return rcuo
 }
 
@@ -369,18 +519,33 @@ func (rcuo *RuleChanUpdateOne) SetNillableUpdatedAt(t *time.Time) *RuleChanUpdat
 }
 
 // AddRuleIDs adds the "rules" edge to the RuleNode entity by IDs.
-func (rcuo *RuleChanUpdateOne) AddRuleIDs(ids ...int) *RuleChanUpdateOne {
+func (rcuo *RuleChanUpdateOne) AddRuleIDs(ids ...uint64) *RuleChanUpdateOne {
 	rcuo.mutation.AddRuleIDs(ids...)
 	return rcuo
 }
 
 // AddRules adds the "rules" edges to the RuleNode entity.
 func (rcuo *RuleChanUpdateOne) AddRules(r ...*RuleNode) *RuleChanUpdateOne {
-	ids := make([]int, len(r))
+	ids := make([]uint64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
 	return rcuo.AddRuleIDs(ids...)
+}
+
+// AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
+func (rcuo *RuleChanUpdateOne) AddSessionIDs(ids ...uint64) *RuleChanUpdateOne {
+	rcuo.mutation.AddSessionIDs(ids...)
+	return rcuo
+}
+
+// AddSessions adds the "sessions" edges to the Session entity.
+func (rcuo *RuleChanUpdateOne) AddSessions(s ...*Session) *RuleChanUpdateOne {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcuo.AddSessionIDs(ids...)
 }
 
 // Mutation returns the RuleChanMutation object of the builder.
@@ -395,18 +560,39 @@ func (rcuo *RuleChanUpdateOne) ClearRules() *RuleChanUpdateOne {
 }
 
 // RemoveRuleIDs removes the "rules" edge to RuleNode entities by IDs.
-func (rcuo *RuleChanUpdateOne) RemoveRuleIDs(ids ...int) *RuleChanUpdateOne {
+func (rcuo *RuleChanUpdateOne) RemoveRuleIDs(ids ...uint64) *RuleChanUpdateOne {
 	rcuo.mutation.RemoveRuleIDs(ids...)
 	return rcuo
 }
 
 // RemoveRules removes "rules" edges to RuleNode entities.
 func (rcuo *RuleChanUpdateOne) RemoveRules(r ...*RuleNode) *RuleChanUpdateOne {
-	ids := make([]int, len(r))
+	ids := make([]uint64, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
 	return rcuo.RemoveRuleIDs(ids...)
+}
+
+// ClearSessions clears all "sessions" edges to the Session entity.
+func (rcuo *RuleChanUpdateOne) ClearSessions() *RuleChanUpdateOne {
+	rcuo.mutation.ClearSessions()
+	return rcuo
+}
+
+// RemoveSessionIDs removes the "sessions" edge to Session entities by IDs.
+func (rcuo *RuleChanUpdateOne) RemoveSessionIDs(ids ...uint64) *RuleChanUpdateOne {
+	rcuo.mutation.RemoveSessionIDs(ids...)
+	return rcuo
+}
+
+// RemoveSessions removes "sessions" edges to Session entities.
+func (rcuo *RuleChanUpdateOne) RemoveSessions(s ...*Session) *RuleChanUpdateOne {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcuo.RemoveSessionIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -489,6 +675,11 @@ func (rcuo *RuleChanUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "RuleChan.name": %w`, err)}
 		}
 	}
+	if v, ok := rcuo.mutation.Description(); ok {
+		if err := rulechan.DescriptionValidator(v); err != nil {
+			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "RuleChan.description": %w`, err)}
+		}
+	}
 	if v, ok := rcuo.mutation.RootNode(); ok {
 		if err := rulechan.RootNodeValidator(v); err != nil {
 			return &ValidationError{Name: "root_node", err: fmt.Errorf(`ent: validator failed for field "RuleChan.root_node": %w`, err)}
@@ -508,7 +699,7 @@ func (rcuo *RuleChanUpdateOne) sqlSave(ctx context.Context) (_node *RuleChan, er
 			Table:   rulechan.Table,
 			Columns: rulechan.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: rulechan.FieldID,
 			},
 		},
@@ -544,11 +735,25 @@ func (rcuo *RuleChanUpdateOne) sqlSave(ctx context.Context) (_node *RuleChan, er
 			Column: rulechan.FieldName,
 		})
 	}
+	if value, ok := rcuo.mutation.Description(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: rulechan.FieldDescription,
+		})
+	}
 	if value, ok := rcuo.mutation.RootNode(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: rulechan.FieldRootNode,
+		})
+	}
+	if value, ok := rcuo.mutation.Infinite(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: rulechan.FieldInfinite,
 		})
 	}
 	if value, ok := rcuo.mutation.Status(); ok {
@@ -581,7 +786,7 @@ func (rcuo *RuleChanUpdateOne) sqlSave(ctx context.Context) (_node *RuleChan, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulenode.FieldID,
 				},
 			},
@@ -597,7 +802,7 @@ func (rcuo *RuleChanUpdateOne) sqlSave(ctx context.Context) (_node *RuleChan, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulenode.FieldID,
 				},
 			},
@@ -616,8 +821,62 @@ func (rcuo *RuleChanUpdateOne) sqlSave(ctx context.Context) (_node *RuleChan, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUint64,
 					Column: rulenode.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if rcuo.mutation.SessionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   rulechan.SessionsTable,
+			Columns: []string{rulechan.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: session.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcuo.mutation.RemovedSessionsIDs(); len(nodes) > 0 && !rcuo.mutation.SessionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   rulechan.SessionsTable,
+			Columns: []string{rulechan.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: session.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcuo.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   rulechan.SessionsTable,
+			Columns: []string{rulechan.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: session.FieldID,
 				},
 			},
 		}

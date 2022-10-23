@@ -15,11 +15,15 @@ import (
 type RuleChan struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Description holds the value of the "description" field.
+	Description *string `json:"description,omitempty"`
 	// RootNode holds the value of the "root_node" field.
 	RootNode string `json:"root_node,omitempty"`
+	// Infinite holds the value of the "infinite" field.
+	Infinite bool `json:"infinite,omitempty"`
 	// Status holds the value of the "status" field.
 	Status rulechan.Status `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -35,9 +39,11 @@ type RuleChan struct {
 type RuleChanEdges struct {
 	// Rules holds the value of the rules edge.
 	Rules []*RuleNode `json:"rules,omitempty"`
+	// Sessions holds the value of the sessions edge.
+	Sessions []*Session `json:"sessions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // RulesOrErr returns the Rules value or an error if the edge
@@ -49,14 +55,25 @@ func (e RuleChanEdges) RulesOrErr() ([]*RuleNode, error) {
 	return nil, &NotLoadedError{edge: "rules"}
 }
 
+// SessionsOrErr returns the Sessions value or an error if the edge
+// was not loaded in eager-loading.
+func (e RuleChanEdges) SessionsOrErr() ([]*Session, error) {
+	if e.loadedTypes[1] {
+		return e.Sessions, nil
+	}
+	return nil, &NotLoadedError{edge: "sessions"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*RuleChan) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case rulechan.FieldInfinite:
+			values[i] = new(sql.NullBool)
 		case rulechan.FieldID:
 			values[i] = new(sql.NullInt64)
-		case rulechan.FieldName, rulechan.FieldRootNode, rulechan.FieldStatus:
+		case rulechan.FieldName, rulechan.FieldDescription, rulechan.FieldRootNode, rulechan.FieldStatus:
 			values[i] = new(sql.NullString)
 		case rulechan.FieldCreatedAt, rulechan.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -80,18 +97,31 @@ func (rc *RuleChan) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			rc.ID = int(value.Int64)
+			rc.ID = uint64(value.Int64)
 		case rulechan.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				rc.Name = value.String
 			}
+		case rulechan.FieldDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field description", values[i])
+			} else if value.Valid {
+				rc.Description = new(string)
+				*rc.Description = value.String
+			}
 		case rulechan.FieldRootNode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field root_node", values[i])
 			} else if value.Valid {
 				rc.RootNode = value.String
+			}
+		case rulechan.FieldInfinite:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field infinite", values[i])
+			} else if value.Valid {
+				rc.Infinite = value.Bool
 			}
 		case rulechan.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -121,6 +151,11 @@ func (rc *RuleChan) QueryRules() *RuleNodeQuery {
 	return (&RuleChanClient{config: rc.config}).QueryRules(rc)
 }
 
+// QuerySessions queries the "sessions" edge of the RuleChan entity.
+func (rc *RuleChan) QuerySessions() *SessionQuery {
+	return (&RuleChanClient{config: rc.config}).QuerySessions(rc)
+}
+
 // Update returns a builder for updating this RuleChan.
 // Note that you need to call RuleChan.Unwrap() before calling this method if this RuleChan
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -147,8 +182,16 @@ func (rc *RuleChan) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(rc.Name)
 	builder.WriteString(", ")
+	if v := rc.Description; v != nil {
+		builder.WriteString("description=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
 	builder.WriteString("root_node=")
 	builder.WriteString(rc.RootNode)
+	builder.WriteString(", ")
+	builder.WriteString("infinite=")
+	builder.WriteString(fmt.Sprintf("%v", rc.Infinite))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", rc.Status))

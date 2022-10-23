@@ -16,6 +16,8 @@ type Tx struct {
 	RuleChan *RuleChanClient
 	// RuleNode is the client for interacting with the RuleNode builders.
 	RuleNode *RuleNodeClient
+	// Session is the client for interacting with the Session builders.
+	Session *SessionClient
 
 	// lazily loaded.
 	client     *Client
@@ -153,6 +155,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.RuleChan = NewRuleChanClient(tx.config)
 	tx.RuleNode = NewRuleNodeClient(tx.config)
+	tx.Session = NewSessionClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

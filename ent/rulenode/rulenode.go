@@ -17,6 +17,8 @@ const (
 	FieldNodeID = "node_id"
 	// FieldOption holds the string denoting the option field in the database.
 	FieldOption = "option"
+	// FieldInfinite holds the string denoting the infinite field in the database.
+	FieldInfinite = "infinite"
 	// FieldDebug holds the string denoting the debug field in the database.
 	FieldDebug = "debug"
 	// FieldEnd holds the string denoting the end field in the database.
@@ -44,6 +46,7 @@ var Columns = []string{
 	FieldChainID,
 	FieldNodeID,
 	FieldOption,
+	FieldInfinite,
 	FieldDebug,
 	FieldEnd,
 	FieldCreatedAt,
@@ -65,6 +68,8 @@ var (
 	NodeIDValidator func(string) error
 	// DefaultOption holds the default value on creation for the "option" field.
 	DefaultOption map[string]interface{}
+	// DefaultInfinite holds the default value on creation for the "infinite" field.
+	DefaultInfinite bool
 	// DefaultDebug holds the default value on creation for the "debug" field.
 	DefaultDebug bool
 	// DefaultEnd holds the default value on creation for the "end" field.

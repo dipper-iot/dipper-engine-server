@@ -11,3 +11,6 @@ type RuleChan func(*sql.Selector)
 
 // RuleNode is the predicate function for rulenode builders.
 type RuleNode func(*sql.Selector)
+
+// Session is the predicate function for session builders.
+type Session func(*sql.Selector)
