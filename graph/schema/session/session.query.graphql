@@ -1,0 +1,4 @@
+extend type Query {
+	ListSession(input: SessionListRequest!): ListSessionInfo!
+	GetSession(id: Uint64!): SessionInfo!
+}

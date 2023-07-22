@@ -1,0 +1,4 @@
+extend type Mutation {
+	AddSession(input: SessionRequest!): Boolean!
+	StopSession(id: Uint64!): Boolean!
+}

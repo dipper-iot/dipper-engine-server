@@ -1,0 +1,19 @@
+type Node {
+    id : Uint64!
+    node_id: String!
+    chain_id: Uint64!
+    rule_id: String!
+    option: Map
+    debug: Boolean!
+    end: Boolean!
+    created_at: Time
+    updated_at: Time
+}
+
+input InputNode {
+    node_id: String!
+    rule_id: String!
+    option: Map
+    debug: Boolean
+    end: Boolean
+}

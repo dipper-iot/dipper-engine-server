@@ -1,2 +1,2 @@
-# -dipper-engine-server
+# dipper-engine-server
 Dipper rule engine server
