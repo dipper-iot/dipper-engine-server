@@ -49,6 +49,20 @@ func (su *SessionUpdate) ClearChainID() *SessionUpdate {
 	return su
 }
 
+// SetIsTest sets the "is_test" field.
+func (su *SessionUpdate) SetIsTest(b bool) *SessionUpdate {
+	su.mutation.SetIsTest(b)
+	return su
+}
+
+// SetNillableIsTest sets the "is_test" field if the given value is not nil.
+func (su *SessionUpdate) SetNillableIsTest(b *bool) *SessionUpdate {
+	if b != nil {
+		su.SetIsTest(*b)
+	}
+	return su
+}
+
 // SetInfinite sets the "infinite" field.
 func (su *SessionUpdate) SetInfinite(b bool) *SessionUpdate {
 	su.mutation.SetInfinite(b)
@@ -72,6 +86,48 @@ func (su *SessionUpdate) SetData(m map[string]interface{}) *SessionUpdate {
 // SetResult sets the "result" field.
 func (su *SessionUpdate) SetResult(m map[string]interface{}) *SessionUpdate {
 	su.mutation.SetResult(m)
+	return su
+}
+
+// SetEndCount sets the "end_count" field.
+func (su *SessionUpdate) SetEndCount(i int) *SessionUpdate {
+	su.mutation.ResetEndCount()
+	su.mutation.SetEndCount(i)
+	return su
+}
+
+// SetNillableEndCount sets the "end_count" field if the given value is not nil.
+func (su *SessionUpdate) SetNillableEndCount(i *int) *SessionUpdate {
+	if i != nil {
+		su.SetEndCount(*i)
+	}
+	return su
+}
+
+// AddEndCount adds i to the "end_count" field.
+func (su *SessionUpdate) AddEndCount(i int) *SessionUpdate {
+	su.mutation.AddEndCount(i)
+	return su
+}
+
+// SetTimeout sets the "timeout" field.
+func (su *SessionUpdate) SetTimeout(i int) *SessionUpdate {
+	su.mutation.ResetTimeout()
+	su.mutation.SetTimeout(i)
+	return su
+}
+
+// SetNillableTimeout sets the "timeout" field if the given value is not nil.
+func (su *SessionUpdate) SetNillableTimeout(i *int) *SessionUpdate {
+	if i != nil {
+		su.SetTimeout(*i)
+	}
+	return su
+}
+
+// AddTimeout adds i to the "timeout" field.
+func (su *SessionUpdate) AddTimeout(i int) *SessionUpdate {
+	su.mutation.AddTimeout(i)
 	return su
 }
 
@@ -191,6 +247,13 @@ func (su *SessionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := su.mutation.IsTest(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: session.FieldIsTest,
+		})
+	}
 	if value, ok := su.mutation.Infinite(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -210,6 +273,34 @@ func (su *SessionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeJSON,
 			Value:  value,
 			Column: session.FieldResult,
+		})
+	}
+	if value, ok := su.mutation.EndCount(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldEndCount,
+		})
+	}
+	if value, ok := su.mutation.AddedEndCount(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldEndCount,
+		})
+	}
+	if value, ok := su.mutation.Timeout(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldTimeout,
+		})
+	}
+	if value, ok := su.mutation.AddedTimeout(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldTimeout,
 		})
 	}
 	if value, ok := su.mutation.CreatedAt(); ok {
@@ -300,6 +391,20 @@ func (suo *SessionUpdateOne) ClearChainID() *SessionUpdateOne {
 	return suo
 }
 
+// SetIsTest sets the "is_test" field.
+func (suo *SessionUpdateOne) SetIsTest(b bool) *SessionUpdateOne {
+	suo.mutation.SetIsTest(b)
+	return suo
+}
+
+// SetNillableIsTest sets the "is_test" field if the given value is not nil.
+func (suo *SessionUpdateOne) SetNillableIsTest(b *bool) *SessionUpdateOne {
+	if b != nil {
+		suo.SetIsTest(*b)
+	}
+	return suo
+}
+
 // SetInfinite sets the "infinite" field.
 func (suo *SessionUpdateOne) SetInfinite(b bool) *SessionUpdateOne {
 	suo.mutation.SetInfinite(b)
@@ -323,6 +428,48 @@ func (suo *SessionUpdateOne) SetData(m map[string]interface{}) *SessionUpdateOne
 // SetResult sets the "result" field.
 func (suo *SessionUpdateOne) SetResult(m map[string]interface{}) *SessionUpdateOne {
 	suo.mutation.SetResult(m)
+	return suo
+}
+
+// SetEndCount sets the "end_count" field.
+func (suo *SessionUpdateOne) SetEndCount(i int) *SessionUpdateOne {
+	suo.mutation.ResetEndCount()
+	suo.mutation.SetEndCount(i)
+	return suo
+}
+
+// SetNillableEndCount sets the "end_count" field if the given value is not nil.
+func (suo *SessionUpdateOne) SetNillableEndCount(i *int) *SessionUpdateOne {
+	if i != nil {
+		suo.SetEndCount(*i)
+	}
+	return suo
+}
+
+// AddEndCount adds i to the "end_count" field.
+func (suo *SessionUpdateOne) AddEndCount(i int) *SessionUpdateOne {
+	suo.mutation.AddEndCount(i)
+	return suo
+}
+
+// SetTimeout sets the "timeout" field.
+func (suo *SessionUpdateOne) SetTimeout(i int) *SessionUpdateOne {
+	suo.mutation.ResetTimeout()
+	suo.mutation.SetTimeout(i)
+	return suo
+}
+
+// SetNillableTimeout sets the "timeout" field if the given value is not nil.
+func (suo *SessionUpdateOne) SetNillableTimeout(i *int) *SessionUpdateOne {
+	if i != nil {
+		suo.SetTimeout(*i)
+	}
+	return suo
+}
+
+// AddTimeout adds i to the "timeout" field.
+func (suo *SessionUpdateOne) AddTimeout(i int) *SessionUpdateOne {
+	suo.mutation.AddTimeout(i)
 	return suo
 }
 
@@ -472,6 +619,13 @@ func (suo *SessionUpdateOne) sqlSave(ctx context.Context) (_node *Session, err e
 			}
 		}
 	}
+	if value, ok := suo.mutation.IsTest(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: session.FieldIsTest,
+		})
+	}
 	if value, ok := suo.mutation.Infinite(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -491,6 +645,34 @@ func (suo *SessionUpdateOne) sqlSave(ctx context.Context) (_node *Session, err e
 			Type:   field.TypeJSON,
 			Value:  value,
 			Column: session.FieldResult,
+		})
+	}
+	if value, ok := suo.mutation.EndCount(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldEndCount,
+		})
+	}
+	if value, ok := suo.mutation.AddedEndCount(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldEndCount,
+		})
+	}
+	if value, ok := suo.mutation.Timeout(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldTimeout,
+		})
+	}
+	if value, ok := suo.mutation.AddedTimeout(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldTimeout,
 		})
 	}
 	if value, ok := suo.mutation.CreatedAt(); ok {

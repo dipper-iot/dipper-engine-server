@@ -13,12 +13,18 @@ const (
 	FieldID = "id"
 	// FieldChainID holds the string denoting the chain_id field in the database.
 	FieldChainID = "chain_id"
+	// FieldIsTest holds the string denoting the is_test field in the database.
+	FieldIsTest = "is_test"
 	// FieldInfinite holds the string denoting the infinite field in the database.
 	FieldInfinite = "infinite"
 	// FieldData holds the string denoting the data field in the database.
 	FieldData = "data"
 	// FieldResult holds the string denoting the result field in the database.
 	FieldResult = "result"
+	// FieldEndCount holds the string denoting the end_count field in the database.
+	FieldEndCount = "end_count"
+	// FieldTimeout holds the string denoting the timeout field in the database.
+	FieldTimeout = "timeout"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -40,9 +46,12 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldChainID,
+	FieldIsTest,
 	FieldInfinite,
 	FieldData,
 	FieldResult,
+	FieldEndCount,
+	FieldTimeout,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -58,12 +67,18 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultIsTest holds the default value on creation for the "is_test" field.
+	DefaultIsTest bool
 	// DefaultInfinite holds the default value on creation for the "infinite" field.
 	DefaultInfinite bool
 	// DefaultData holds the default value on creation for the "data" field.
 	DefaultData map[string]interface{}
 	// DefaultResult holds the default value on creation for the "result" field.
 	DefaultResult map[string]interface{}
+	// DefaultEndCount holds the default value on creation for the "end_count" field.
+	DefaultEndCount int
+	// DefaultTimeout holds the default value on creation for the "timeout" field.
+	DefaultTimeout int
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

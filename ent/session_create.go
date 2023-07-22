@@ -35,6 +35,20 @@ func (sc *SessionCreate) SetNillableChainID(u *uint64) *SessionCreate {
 	return sc
 }
 
+// SetIsTest sets the "is_test" field.
+func (sc *SessionCreate) SetIsTest(b bool) *SessionCreate {
+	sc.mutation.SetIsTest(b)
+	return sc
+}
+
+// SetNillableIsTest sets the "is_test" field if the given value is not nil.
+func (sc *SessionCreate) SetNillableIsTest(b *bool) *SessionCreate {
+	if b != nil {
+		sc.SetIsTest(*b)
+	}
+	return sc
+}
+
 // SetInfinite sets the "infinite" field.
 func (sc *SessionCreate) SetInfinite(b bool) *SessionCreate {
 	sc.mutation.SetInfinite(b)
@@ -58,6 +72,34 @@ func (sc *SessionCreate) SetData(m map[string]interface{}) *SessionCreate {
 // SetResult sets the "result" field.
 func (sc *SessionCreate) SetResult(m map[string]interface{}) *SessionCreate {
 	sc.mutation.SetResult(m)
+	return sc
+}
+
+// SetEndCount sets the "end_count" field.
+func (sc *SessionCreate) SetEndCount(i int) *SessionCreate {
+	sc.mutation.SetEndCount(i)
+	return sc
+}
+
+// SetNillableEndCount sets the "end_count" field if the given value is not nil.
+func (sc *SessionCreate) SetNillableEndCount(i *int) *SessionCreate {
+	if i != nil {
+		sc.SetEndCount(*i)
+	}
+	return sc
+}
+
+// SetTimeout sets the "timeout" field.
+func (sc *SessionCreate) SetTimeout(i int) *SessionCreate {
+	sc.mutation.SetTimeout(i)
+	return sc
+}
+
+// SetNillableTimeout sets the "timeout" field if the given value is not nil.
+func (sc *SessionCreate) SetNillableTimeout(i *int) *SessionCreate {
+	if i != nil {
+		sc.SetTimeout(*i)
+	}
 	return sc
 }
 
@@ -177,6 +219,10 @@ func (sc *SessionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *SessionCreate) defaults() {
+	if _, ok := sc.mutation.IsTest(); !ok {
+		v := session.DefaultIsTest
+		sc.mutation.SetIsTest(v)
+	}
 	if _, ok := sc.mutation.Infinite(); !ok {
 		v := session.DefaultInfinite
 		sc.mutation.SetInfinite(v)
@@ -188,6 +234,14 @@ func (sc *SessionCreate) defaults() {
 	if _, ok := sc.mutation.Result(); !ok {
 		v := session.DefaultResult
 		sc.mutation.SetResult(v)
+	}
+	if _, ok := sc.mutation.EndCount(); !ok {
+		v := session.DefaultEndCount
+		sc.mutation.SetEndCount(v)
+	}
+	if _, ok := sc.mutation.Timeout(); !ok {
+		v := session.DefaultTimeout
+		sc.mutation.SetTimeout(v)
 	}
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		v := session.DefaultCreatedAt()
@@ -201,6 +255,9 @@ func (sc *SessionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *SessionCreate) check() error {
+	if _, ok := sc.mutation.IsTest(); !ok {
+		return &ValidationError{Name: "is_test", err: errors.New(`ent: missing required field "Session.is_test"`)}
+	}
 	if _, ok := sc.mutation.Infinite(); !ok {
 		return &ValidationError{Name: "infinite", err: errors.New(`ent: missing required field "Session.infinite"`)}
 	}
@@ -209,6 +266,12 @@ func (sc *SessionCreate) check() error {
 	}
 	if _, ok := sc.mutation.Result(); !ok {
 		return &ValidationError{Name: "result", err: errors.New(`ent: missing required field "Session.result"`)}
+	}
+	if _, ok := sc.mutation.EndCount(); !ok {
+		return &ValidationError{Name: "end_count", err: errors.New(`ent: missing required field "Session.end_count"`)}
+	}
+	if _, ok := sc.mutation.Timeout(); !ok {
+		return &ValidationError{Name: "timeout", err: errors.New(`ent: missing required field "Session.timeout"`)}
 	}
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Session.created_at"`)}
@@ -249,6 +312,14 @@ func (sc *SessionCreate) createSpec() (*Session, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := sc.mutation.IsTest(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: session.FieldIsTest,
+		})
+		_node.IsTest = value
+	}
 	if value, ok := sc.mutation.Infinite(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -272,6 +343,22 @@ func (sc *SessionCreate) createSpec() (*Session, *sqlgraph.CreateSpec) {
 			Column: session.FieldResult,
 		})
 		_node.Result = value
+	}
+	if value, ok := sc.mutation.EndCount(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldEndCount,
+		})
+		_node.EndCount = value
+	}
+	if value, ok := sc.mutation.Timeout(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: session.FieldTimeout,
+		})
+		_node.Timeout = value
 	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

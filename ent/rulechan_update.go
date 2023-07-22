@@ -48,20 +48,6 @@ func (rcu *RuleChanUpdate) SetRootNode(s string) *RuleChanUpdate {
 	return rcu
 }
 
-// SetInfinite sets the "infinite" field.
-func (rcu *RuleChanUpdate) SetInfinite(b bool) *RuleChanUpdate {
-	rcu.mutation.SetInfinite(b)
-	return rcu
-}
-
-// SetNillableInfinite sets the "infinite" field if the given value is not nil.
-func (rcu *RuleChanUpdate) SetNillableInfinite(b *bool) *RuleChanUpdate {
-	if b != nil {
-		rcu.SetInfinite(*b)
-	}
-	return rcu
-}
-
 // SetStatus sets the "status" field.
 func (rcu *RuleChanUpdate) SetStatus(r rulechan.Status) *RuleChanUpdate {
 	rcu.mutation.SetStatus(r)
@@ -297,13 +283,6 @@ func (rcu *RuleChanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: rulechan.FieldRootNode,
 		})
 	}
-	if value, ok := rcu.mutation.Infinite(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: rulechan.FieldInfinite,
-		})
-	}
 	if value, ok := rcu.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
@@ -467,20 +446,6 @@ func (rcuo *RuleChanUpdateOne) SetDescription(s string) *RuleChanUpdateOne {
 // SetRootNode sets the "root_node" field.
 func (rcuo *RuleChanUpdateOne) SetRootNode(s string) *RuleChanUpdateOne {
 	rcuo.mutation.SetRootNode(s)
-	return rcuo
-}
-
-// SetInfinite sets the "infinite" field.
-func (rcuo *RuleChanUpdateOne) SetInfinite(b bool) *RuleChanUpdateOne {
-	rcuo.mutation.SetInfinite(b)
-	return rcuo
-}
-
-// SetNillableInfinite sets the "infinite" field if the given value is not nil.
-func (rcuo *RuleChanUpdateOne) SetNillableInfinite(b *bool) *RuleChanUpdateOne {
-	if b != nil {
-		rcuo.SetInfinite(*b)
-	}
 	return rcuo
 }
 
@@ -747,13 +712,6 @@ func (rcuo *RuleChanUpdateOne) sqlSave(ctx context.Context) (_node *RuleChan, er
 			Type:   field.TypeString,
 			Value:  value,
 			Column: rulechan.FieldRootNode,
-		})
-	}
-	if value, ok := rcuo.mutation.Infinite(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: rulechan.FieldInfinite,
 		})
 	}
 	if value, ok := rcuo.mutation.Status(); ok {

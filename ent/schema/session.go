@@ -20,9 +20,12 @@ func (Session) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id").Unique().Immutable(),
 		field.Uint64("chain_id").Optional(),
+		field.Bool("is_test").Default(false),
 		field.Bool("infinite").Default(false),
 		field.JSON("data", map[string]interface{}{}).Default(map[string]interface{}{}),
 		field.JSON("result", map[string]interface{}{}).Default(map[string]interface{}{}),
+		field.Int("end_count").Default(0),
+		field.Int("timeout").Default(30),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now),
 	}

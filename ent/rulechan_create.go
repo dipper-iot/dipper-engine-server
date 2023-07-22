@@ -40,20 +40,6 @@ func (rcc *RuleChanCreate) SetRootNode(s string) *RuleChanCreate {
 	return rcc
 }
 
-// SetInfinite sets the "infinite" field.
-func (rcc *RuleChanCreate) SetInfinite(b bool) *RuleChanCreate {
-	rcc.mutation.SetInfinite(b)
-	return rcc
-}
-
-// SetNillableInfinite sets the "infinite" field if the given value is not nil.
-func (rcc *RuleChanCreate) SetNillableInfinite(b *bool) *RuleChanCreate {
-	if b != nil {
-		rcc.SetInfinite(*b)
-	}
-	return rcc
-}
-
 // SetStatus sets the "status" field.
 func (rcc *RuleChanCreate) SetStatus(r rulechan.Status) *RuleChanCreate {
 	rcc.mutation.SetStatus(r)
@@ -201,10 +187,6 @@ func (rcc *RuleChanCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rcc *RuleChanCreate) defaults() {
-	if _, ok := rcc.mutation.Infinite(); !ok {
-		v := rulechan.DefaultInfinite
-		rcc.mutation.SetInfinite(v)
-	}
 	if _, ok := rcc.mutation.CreatedAt(); !ok {
 		v := rulechan.DefaultCreatedAt()
 		rcc.mutation.SetCreatedAt(v)
@@ -240,9 +222,6 @@ func (rcc *RuleChanCreate) check() error {
 		if err := rulechan.RootNodeValidator(v); err != nil {
 			return &ValidationError{Name: "root_node", err: fmt.Errorf(`ent: validator failed for field "RuleChan.root_node": %w`, err)}
 		}
-	}
-	if _, ok := rcc.mutation.Infinite(); !ok {
-		return &ValidationError{Name: "infinite", err: errors.New(`ent: missing required field "RuleChan.infinite"`)}
 	}
 	if _, ok := rcc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "RuleChan.status"`)}
@@ -314,14 +293,6 @@ func (rcc *RuleChanCreate) createSpec() (*RuleChan, *sqlgraph.CreateSpec) {
 			Column: rulechan.FieldRootNode,
 		})
 		_node.RootNode = value
-	}
-	if value, ok := rcc.mutation.Infinite(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: rulechan.FieldInfinite,
-		})
-		_node.Infinite = value
 	}
 	if value, ok := rcc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

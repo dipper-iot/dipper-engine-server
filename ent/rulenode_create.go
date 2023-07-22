@@ -53,20 +53,6 @@ func (rnc *RuleNodeCreate) SetOption(m map[string]interface{}) *RuleNodeCreate {
 	return rnc
 }
 
-// SetInfinite sets the "infinite" field.
-func (rnc *RuleNodeCreate) SetInfinite(b bool) *RuleNodeCreate {
-	rnc.mutation.SetInfinite(b)
-	return rnc
-}
-
-// SetNillableInfinite sets the "infinite" field if the given value is not nil.
-func (rnc *RuleNodeCreate) SetNillableInfinite(b *bool) *RuleNodeCreate {
-	if b != nil {
-		rnc.SetInfinite(*b)
-	}
-	return rnc
-}
-
 // SetDebug sets the "debug" field.
 func (rnc *RuleNodeCreate) SetDebug(b bool) *RuleNodeCreate {
 	rnc.mutation.SetDebug(b)
@@ -215,10 +201,6 @@ func (rnc *RuleNodeCreate) defaults() {
 		v := rulenode.DefaultOption
 		rnc.mutation.SetOption(v)
 	}
-	if _, ok := rnc.mutation.Infinite(); !ok {
-		v := rulenode.DefaultInfinite
-		rnc.mutation.SetInfinite(v)
-	}
 	if _, ok := rnc.mutation.Debug(); !ok {
 		v := rulenode.DefaultDebug
 		rnc.mutation.SetDebug(v)
@@ -257,9 +239,6 @@ func (rnc *RuleNodeCreate) check() error {
 	}
 	if _, ok := rnc.mutation.Option(); !ok {
 		return &ValidationError{Name: "option", err: errors.New(`ent: missing required field "RuleNode.option"`)}
-	}
-	if _, ok := rnc.mutation.Infinite(); !ok {
-		return &ValidationError{Name: "infinite", err: errors.New(`ent: missing required field "RuleNode.infinite"`)}
 	}
 	if _, ok := rnc.mutation.Debug(); !ok {
 		return &ValidationError{Name: "debug", err: errors.New(`ent: missing required field "RuleNode.debug"`)}
@@ -329,14 +308,6 @@ func (rnc *RuleNodeCreate) createSpec() (*RuleNode, *sqlgraph.CreateSpec) {
 			Column: rulenode.FieldOption,
 		})
 		_node.Option = value
-	}
-	if value, ok := rnc.mutation.Infinite(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: rulenode.FieldInfinite,
-		})
-		_node.Infinite = value
 	}
 	if value, ok := rnc.mutation.Debug(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

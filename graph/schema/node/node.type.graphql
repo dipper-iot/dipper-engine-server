@@ -4,7 +4,6 @@ type Node {
     chain_id: Uint64!
     rule_id: String!
     option: Map
-    infinite: Boolean!
     debug: Boolean!
     end: Boolean!
     created_at: Time
@@ -15,7 +14,6 @@ input InputNode {
     node_id: String!
     rule_id: String!
     option: Map
-    infinite: Boolean
     debug: Boolean
     end: Boolean
 }

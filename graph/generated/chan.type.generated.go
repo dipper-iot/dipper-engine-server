@@ -22,7 +22,6 @@ import (
 
 type ChanResolver interface {
 	Nodes(ctx context.Context, obj *ent.RuleChan) ([]*ent.RuleNode, error)
-
 	Status(ctx context.Context, obj *ent.RuleChan) (*model.ChanStatus, error)
 }
 
@@ -254,8 +253,6 @@ func (ec *executionContext) fieldContext_Chan_nodes(ctx context.Context, field g
 				return ec.fieldContext_Node_rule_id(ctx, field)
 			case "option":
 				return ec.fieldContext_Node_option(ctx, field)
-			case "infinite":
-				return ec.fieldContext_Node_infinite(ctx, field)
 			case "debug":
 				return ec.fieldContext_Node_debug(ctx, field)
 			case "end":
@@ -266,47 +263,6 @@ func (ec *executionContext) fieldContext_Chan_nodes(ctx context.Context, field g
 				return ec.fieldContext_Node_updated_at(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Node", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Chan_infinite(ctx context.Context, field graphql.CollectedField, obj *ent.RuleChan) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Chan_infinite(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Infinite, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Chan_infinite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Chan",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -525,8 +481,6 @@ func (ec *executionContext) fieldContext_ListChan_list(ctx context.Context, fiel
 				return ec.fieldContext_Chan_root_node(ctx, field)
 			case "nodes":
 				return ec.fieldContext_Chan_nodes(ctx, field)
-			case "infinite":
-				return ec.fieldContext_Chan_infinite(ctx, field)
 			case "status":
 				return ec.fieldContext_Chan_status(ctx, field)
 			case "created_at":
@@ -709,10 +663,6 @@ func (ec *executionContext) _Chan(ctx context.Context, sel ast.SelectionSet, obj
 				return innerFunc(ctx)
 
 			})
-		case "infinite":
-
-			out.Values[i] = ec._Chan_infinite(ctx, field, obj)
-
 		case "status":
 			field := field
 

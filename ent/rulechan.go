@@ -22,8 +22,6 @@ type RuleChan struct {
 	Description *string `json:"description,omitempty"`
 	// RootNode holds the value of the "root_node" field.
 	RootNode string `json:"root_node,omitempty"`
-	// Infinite holds the value of the "infinite" field.
-	Infinite bool `json:"infinite,omitempty"`
 	// Status holds the value of the "status" field.
 	Status rulechan.Status `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -69,8 +67,6 @@ func (*RuleChan) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case rulechan.FieldInfinite:
-			values[i] = new(sql.NullBool)
 		case rulechan.FieldID:
 			values[i] = new(sql.NullInt64)
 		case rulechan.FieldName, rulechan.FieldDescription, rulechan.FieldRootNode, rulechan.FieldStatus:
@@ -116,12 +112,6 @@ func (rc *RuleChan) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field root_node", values[i])
 			} else if value.Valid {
 				rc.RootNode = value.String
-			}
-		case rulechan.FieldInfinite:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field infinite", values[i])
-			} else if value.Valid {
-				rc.Infinite = value.Bool
 			}
 		case rulechan.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -189,9 +179,6 @@ func (rc *RuleChan) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("root_node=")
 	builder.WriteString(rc.RootNode)
-	builder.WriteString(", ")
-	builder.WriteString("infinite=")
-	builder.WriteString(fmt.Sprintf("%v", rc.Infinite))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", rc.Status))

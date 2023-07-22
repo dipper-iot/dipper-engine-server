@@ -102,13 +102,6 @@ func RuleID(v string) predicate.RuleNode {
 	})
 }
 
-// Infinite applies equality check predicate on the "infinite" field. It's identical to InfiniteEQ.
-func Infinite(v bool) predicate.RuleNode {
-	return predicate.RuleNode(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldInfinite), v))
-	})
-}
-
 // Debug applies equality check predicate on the "debug" field. It's identical to DebugEQ.
 func Debug(v bool) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
@@ -382,20 +375,6 @@ func RuleIDEqualFold(v string) predicate.RuleNode {
 func RuleIDContainsFold(v string) predicate.RuleNode {
 	return predicate.RuleNode(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldRuleID), v))
-	})
-}
-
-// InfiniteEQ applies the EQ predicate on the "infinite" field.
-func InfiniteEQ(v bool) predicate.RuleNode {
-	return predicate.RuleNode(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldInfinite), v))
-	})
-}
-
-// InfiniteNEQ applies the NEQ predicate on the "infinite" field.
-func InfiniteNEQ(v bool) predicate.RuleNode {
-	return predicate.RuleNode(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldInfinite), v))
 	})
 }
 

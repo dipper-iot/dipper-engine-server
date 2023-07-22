@@ -102,13 +102,6 @@ func RootNode(v string) predicate.RuleChan {
 	})
 }
 
-// Infinite applies equality check predicate on the "infinite" field. It's identical to InfiniteEQ.
-func Infinite(v bool) predicate.RuleChan {
-	return predicate.RuleChan(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldInfinite), v))
-	})
-}
-
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
@@ -417,20 +410,6 @@ func RootNodeEqualFold(v string) predicate.RuleChan {
 func RootNodeContainsFold(v string) predicate.RuleChan {
 	return predicate.RuleChan(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldRootNode), v))
-	})
-}
-
-// InfiniteEQ applies the EQ predicate on the "infinite" field.
-func InfiniteEQ(v bool) predicate.RuleChan {
-	return predicate.RuleChan(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldInfinite), v))
-	})
-}
-
-// InfiniteNEQ applies the NEQ predicate on the "infinite" field.
-func InfiniteNEQ(v bool) predicate.RuleChan {
-	return predicate.RuleChan(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldInfinite), v))
 	})
 }
 

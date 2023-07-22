@@ -88,10 +88,31 @@ func ChainID(v uint64) predicate.Session {
 	})
 }
 
+// IsTest applies equality check predicate on the "is_test" field. It's identical to IsTestEQ.
+func IsTest(v bool) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIsTest), v))
+	})
+}
+
 // Infinite applies equality check predicate on the "infinite" field. It's identical to InfiniteEQ.
 func Infinite(v bool) predicate.Session {
 	return predicate.Session(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldInfinite), v))
+	})
+}
+
+// EndCount applies equality check predicate on the "end_count" field. It's identical to EndCountEQ.
+func EndCount(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldEndCount), v))
+	})
+}
+
+// Timeout applies equality check predicate on the "timeout" field. It's identical to TimeoutEQ.
+func Timeout(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTimeout), v))
 	})
 }
 
@@ -159,6 +180,20 @@ func ChainIDNotNil() predicate.Session {
 	})
 }
 
+// IsTestEQ applies the EQ predicate on the "is_test" field.
+func IsTestEQ(v bool) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIsTest), v))
+	})
+}
+
+// IsTestNEQ applies the NEQ predicate on the "is_test" field.
+func IsTestNEQ(v bool) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldIsTest), v))
+	})
+}
+
 // InfiniteEQ applies the EQ predicate on the "infinite" field.
 func InfiniteEQ(v bool) predicate.Session {
 	return predicate.Session(func(s *sql.Selector) {
@@ -170,6 +205,134 @@ func InfiniteEQ(v bool) predicate.Session {
 func InfiniteNEQ(v bool) predicate.Session {
 	return predicate.Session(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldInfinite), v))
+	})
+}
+
+// EndCountEQ applies the EQ predicate on the "end_count" field.
+func EndCountEQ(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldEndCount), v))
+	})
+}
+
+// EndCountNEQ applies the NEQ predicate on the "end_count" field.
+func EndCountNEQ(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldEndCount), v))
+	})
+}
+
+// EndCountIn applies the In predicate on the "end_count" field.
+func EndCountIn(vs ...int) predicate.Session {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldEndCount), v...))
+	})
+}
+
+// EndCountNotIn applies the NotIn predicate on the "end_count" field.
+func EndCountNotIn(vs ...int) predicate.Session {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldEndCount), v...))
+	})
+}
+
+// EndCountGT applies the GT predicate on the "end_count" field.
+func EndCountGT(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldEndCount), v))
+	})
+}
+
+// EndCountGTE applies the GTE predicate on the "end_count" field.
+func EndCountGTE(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldEndCount), v))
+	})
+}
+
+// EndCountLT applies the LT predicate on the "end_count" field.
+func EndCountLT(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldEndCount), v))
+	})
+}
+
+// EndCountLTE applies the LTE predicate on the "end_count" field.
+func EndCountLTE(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldEndCount), v))
+	})
+}
+
+// TimeoutEQ applies the EQ predicate on the "timeout" field.
+func TimeoutEQ(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTimeout), v))
+	})
+}
+
+// TimeoutNEQ applies the NEQ predicate on the "timeout" field.
+func TimeoutNEQ(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTimeout), v))
+	})
+}
+
+// TimeoutIn applies the In predicate on the "timeout" field.
+func TimeoutIn(vs ...int) predicate.Session {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldTimeout), v...))
+	})
+}
+
+// TimeoutNotIn applies the NotIn predicate on the "timeout" field.
+func TimeoutNotIn(vs ...int) predicate.Session {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldTimeout), v...))
+	})
+}
+
+// TimeoutGT applies the GT predicate on the "timeout" field.
+func TimeoutGT(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTimeout), v))
+	})
+}
+
+// TimeoutGTE applies the GTE predicate on the "timeout" field.
+func TimeoutGTE(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTimeout), v))
+	})
+}
+
+// TimeoutLT applies the LT predicate on the "timeout" field.
+func TimeoutLT(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTimeout), v))
+	})
+}
+
+// TimeoutLTE applies the LTE predicate on the "timeout" field.
+func TimeoutLTE(v int) predicate.Session {
+	return predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTimeout), v))
 	})
 }
 

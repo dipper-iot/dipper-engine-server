@@ -26,8 +26,6 @@ type RuleNode struct {
 	RuleID string `json:"rule_id,omitempty"`
 	// Option holds the value of the "option" field.
 	Option map[string]interface{} `json:"option,omitempty"`
-	// Infinite holds the value of the "infinite" field.
-	Infinite bool `json:"infinite,omitempty"`
 	// Debug holds the value of the "debug" field.
 	Debug bool `json:"debug,omitempty"`
 	// End holds the value of the "end" field.
@@ -70,7 +68,7 @@ func (*RuleNode) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case rulenode.FieldOption:
 			values[i] = new([]byte)
-		case rulenode.FieldInfinite, rulenode.FieldDebug, rulenode.FieldEnd:
+		case rulenode.FieldDebug, rulenode.FieldEnd:
 			values[i] = new(sql.NullBool)
 		case rulenode.FieldID, rulenode.FieldChainID:
 			values[i] = new(sql.NullInt64)
@@ -124,12 +122,6 @@ func (rn *RuleNode) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &rn.Option); err != nil {
 					return fmt.Errorf("unmarshal field option: %w", err)
 				}
-			}
-		case rulenode.FieldInfinite:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field infinite", values[i])
-			} else if value.Valid {
-				rn.Infinite = value.Bool
 			}
 		case rulenode.FieldDebug:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -199,9 +191,6 @@ func (rn *RuleNode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("option=")
 	builder.WriteString(fmt.Sprintf("%v", rn.Option))
-	builder.WriteString(", ")
-	builder.WriteString("infinite=")
-	builder.WriteString(fmt.Sprintf("%v", rn.Infinite))
 	builder.WriteString(", ")
 	builder.WriteString("debug=")
 	builder.WriteString(fmt.Sprintf("%v", rn.Debug))

@@ -6,7 +6,7 @@ type ListChanRequest struct {
 }
 
 type ListSessionRequest struct {
-	Running bool `json:"running"`
-	Limit   int  `json:"limit"`
-	Skip    int  `json:"skip"`
+	Infinity *bool `json:"infinity"`
+	Limit    int   `json:"limit"`
+	Skip     int   `json:"skip"`
 }

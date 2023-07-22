@@ -1,0 +1,47 @@
+type SessionInfo {
+    id: Uint64!
+    chan_id: Uint64!
+    infinity: Boolean!
+    chan: Chan
+}
+
+
+type ListSessionInfo {
+    total: Int!
+    sessions: [SessionInfo]
+}
+input SessionListRequest {
+    infinity: Boolean!
+    skip: Int!
+    limit: Int!
+}
+
+type SessionOutput {
+    chan_id: Uint64!
+    session_id: Uint64!
+    form_engine: String!
+    data: Map!
+    type: OutputType!
+    error: ErrorEngine
+}
+
+type ErrorEngine {
+    message:     String
+    error_detail: String
+    code   : Int
+}
+
+enum OutputType {
+    Success
+    Error
+}
+
+input DebugFilter {
+    chan_id: String
+}
+
+input SessionRequest {
+    chan_id: String!
+    is_test: Boolean!
+    data: Map
+}

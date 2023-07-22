@@ -8,12 +8,11 @@ import (
 func InputNode(node *model.InputNode) *models.Node {
 
 	r := &models.Node{
-		NodeID:   node.NodeID,
-		RuleID:   node.RuleID,
-		Debug:    false,
-		End:      false,
-		Infinite: false,
-		Option:   node.Option,
+		NodeID: node.NodeID,
+		RuleID: node.RuleID,
+		Debug:  false,
+		End:    false,
+		Option: node.Option,
 	}
 
 	if node.End != nil {
@@ -22,10 +21,6 @@ func InputNode(node *model.InputNode) *models.Node {
 
 	if node.Debug != nil {
 		r.Debug = *node.Debug
-	}
-
-	if node.Infinite != nil {
-		r.Infinite = *node.Infinite
 	}
 
 	return r

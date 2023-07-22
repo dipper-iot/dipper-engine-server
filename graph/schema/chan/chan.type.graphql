@@ -4,7 +4,6 @@ type Chan {
     description: String
     root_node: String
     nodes: [Node!]
-    infinite: Boolean
     status: ChanStatus
     created_at: Time
     updated_at: Time

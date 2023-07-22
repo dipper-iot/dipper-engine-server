@@ -20,12 +20,18 @@ type Session struct {
 	ID uint64 `json:"id,omitempty"`
 	// ChainID holds the value of the "chain_id" field.
 	ChainID uint64 `json:"chain_id,omitempty"`
+	// IsTest holds the value of the "is_test" field.
+	IsTest bool `json:"is_test,omitempty"`
 	// Infinite holds the value of the "infinite" field.
 	Infinite bool `json:"infinite,omitempty"`
 	// Data holds the value of the "data" field.
 	Data map[string]interface{} `json:"data,omitempty"`
 	// Result holds the value of the "result" field.
 	Result map[string]interface{} `json:"result,omitempty"`
+	// EndCount holds the value of the "end_count" field.
+	EndCount int `json:"end_count,omitempty"`
+	// Timeout holds the value of the "timeout" field.
+	Timeout int `json:"timeout,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -64,9 +70,9 @@ func (*Session) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case session.FieldData, session.FieldResult:
 			values[i] = new([]byte)
-		case session.FieldInfinite:
+		case session.FieldIsTest, session.FieldInfinite:
 			values[i] = new(sql.NullBool)
-		case session.FieldID, session.FieldChainID:
+		case session.FieldID, session.FieldChainID, session.FieldEndCount, session.FieldTimeout:
 			values[i] = new(sql.NullInt64)
 		case session.FieldCreatedAt, session.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -97,6 +103,12 @@ func (s *Session) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.ChainID = uint64(value.Int64)
 			}
+		case session.FieldIsTest:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_test", values[i])
+			} else if value.Valid {
+				s.IsTest = value.Bool
+			}
 		case session.FieldInfinite:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field infinite", values[i])
@@ -118,6 +130,18 @@ func (s *Session) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &s.Result); err != nil {
 					return fmt.Errorf("unmarshal field result: %w", err)
 				}
+			}
+		case session.FieldEndCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field end_count", values[i])
+			} else if value.Valid {
+				s.EndCount = int(value.Int64)
+			}
+		case session.FieldTimeout:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field timeout", values[i])
+			} else if value.Valid {
+				s.Timeout = int(value.Int64)
 			}
 		case session.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -167,6 +191,9 @@ func (s *Session) String() string {
 	builder.WriteString("chain_id=")
 	builder.WriteString(fmt.Sprintf("%v", s.ChainID))
 	builder.WriteString(", ")
+	builder.WriteString("is_test=")
+	builder.WriteString(fmt.Sprintf("%v", s.IsTest))
+	builder.WriteString(", ")
 	builder.WriteString("infinite=")
 	builder.WriteString(fmt.Sprintf("%v", s.Infinite))
 	builder.WriteString(", ")
@@ -175,6 +202,12 @@ func (s *Session) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("result=")
 	builder.WriteString(fmt.Sprintf("%v", s.Result))
+	builder.WriteString(", ")
+	builder.WriteString("end_count=")
+	builder.WriteString(fmt.Sprintf("%v", s.EndCount))
+	builder.WriteString(", ")
+	builder.WriteString("timeout=")
+	builder.WriteString(fmt.Sprintf("%v", s.Timeout))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(s.CreatedAt.Format(time.ANSIC))

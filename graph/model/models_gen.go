@@ -10,23 +10,58 @@ import (
 	"github.com/dipper-iot/dipper-engine-server/ent"
 )
 
+type DebugFilter struct {
+	ChanID *string `json:"chan_id"`
+}
+
+type ErrorEngine struct {
+	Message     *string `json:"message"`
+	ErrorDetail *string `json:"error_detail"`
+	Code        *int    `json:"code"`
+}
+
 type InputChan struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description"`
 }
 
 type InputNode struct {
-	NodeID   string                 `json:"node_id"`
-	RuleID   string                 `json:"rule_id"`
-	Option   map[string]interface{} `json:"option"`
-	Infinite *bool                  `json:"infinite"`
-	Debug    *bool                  `json:"debug"`
-	End      *bool                  `json:"end"`
+	NodeID string                 `json:"node_id"`
+	RuleID string                 `json:"rule_id"`
+	Option map[string]interface{} `json:"option"`
+	Debug  *bool                  `json:"debug"`
+	End    *bool                  `json:"end"`
 }
 
 type ListChan struct {
 	Total int             `json:"total"`
 	List  []*ent.RuleChan `json:"list"`
+}
+
+type ListSessionInfo struct {
+	Total    int            `json:"total"`
+	Sessions []*ent.Session `json:"sessions"`
+}
+
+type SessionListRequest struct {
+	Infinity bool `json:"infinity"`
+	Skip     int  `json:"skip"`
+	Limit    int  `json:"limit"`
+}
+
+type SessionOutput struct {
+	ChanID     uint64                 `json:"chan_id"`
+	SessionID  uint64                 `json:"session_id"`
+	FormEngine string                 `json:"form_engine"`
+	Data       map[string]interface{} `json:"data"`
+	Type       OutputType             `json:"type"`
+	Error      *ErrorEngine           `json:"error"`
+}
+
+type SessionRequest struct {
+	ChanID string                 `json:"chan_id"`
+	IsTest bool                   `json:"is_test"`
+	Data   map[string]interface{} `json:"data"`
 }
 
 type SetStatusChan struct {
@@ -76,5 +111,46 @@ func (e *ChanStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ChanStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type OutputType string
+
+const (
+	OutputTypeSuccess OutputType = "Success"
+	OutputTypeError   OutputType = "Error"
+)
+
+var AllOutputType = []OutputType{
+	OutputTypeSuccess,
+	OutputTypeError,
+}
+
+func (e OutputType) IsValid() bool {
+	switch e {
+	case OutputTypeSuccess, OutputTypeError:
+		return true
+	}
+	return false
+}
+
+func (e OutputType) String() string {
+	return string(e)
+}
+
+func (e *OutputType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = OutputType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid OutputType", str)
+	}
+	return nil
+}
+
+func (e OutputType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

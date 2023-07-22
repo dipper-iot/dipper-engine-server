@@ -95,6 +95,9 @@ func (d *Database) Connect(ctx context.Context) error {
 	if d.config.Debug {
 		d.clientRead = clientRead.Debug()
 		d.clientWrite = clientWrite.Debug()
+	} else {
+		d.clientRead = clientRead
+		d.clientWrite = clientWrite
 	}
 
 	if d.config.Migration {

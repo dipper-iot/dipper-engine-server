@@ -246,50 +246,6 @@ func (ec *executionContext) fieldContext_Node_option(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Node_infinite(ctx context.Context, field graphql.CollectedField, obj *ent.RuleNode) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Node_infinite(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Infinite, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Node_infinite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Node",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Node_debug(ctx context.Context, field graphql.CollectedField, obj *ent.RuleNode) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Node_debug(ctx, field)
 	if err != nil {
@@ -471,7 +427,7 @@ func (ec *executionContext) unmarshalInputInputNode(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"node_id", "rule_id", "option", "infinite", "debug", "end"}
+	fieldsInOrder := [...]string{"node_id", "rule_id", "option", "debug", "end"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -499,14 +455,6 @@ func (ec *executionContext) unmarshalInputInputNode(ctx context.Context, obj int
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("option"))
 			it.Option, err = ec.unmarshalOMap2map(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "infinite":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("infinite"))
-			it.Infinite, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -582,13 +530,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Node_option(ctx, field, obj)
 
-		case "infinite":
-
-			out.Values[i] = ec._Node_infinite(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "debug":
 
 			out.Values[i] = ec._Node_debug(ctx, field, obj)

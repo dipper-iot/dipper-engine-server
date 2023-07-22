@@ -23,7 +23,6 @@ func (RuleNode) Fields() []ent.Field {
 		field.String("node_id").NotEmpty().MaxLen(20),
 		field.String("rule_id").NotEmpty().MaxLen(100),
 		field.JSON("option", map[string]interface{}{}).Default(map[string]interface{}{}),
-		field.Bool("infinite").Default(false),
 		field.Bool("debug").Default(false),
 		field.Bool("end").Default(false),
 		field.Time("created_at").Default(time.Now),
